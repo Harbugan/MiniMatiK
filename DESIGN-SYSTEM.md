@@ -17,3 +17,13 @@ Keep the staggered **3 upper + 4 lower** chord pads. Place a compact row of four
 
 ## Change control
 Treat the handed-over HTML as the visual baseline. No cosmetic redesign without an approved design decision. Preserve identity and functional hierarchy over decorative additions.
+
+
+## ChordMatiK interaction refinements — approved
+- Upper chord row: ii / iii / vi; lower row: I / IV / V / vii°. Degree labels and chord names reflect the selected key/scale.
+- Compact KEY + SCALE controls; four modifiers remain above the chord pads.
+- STRUM uses a small Slow–Fast slider; keep it out of the primary seven-pad performance area.
+- Prioritize simultaneous right-hand chords/modifiers and left-hand X/Y joystick. Validate multi-touch and minimum comfortable targets on the actual iPad.
+
+## PS1 display — creative direction, not a finalized visual specification
+The left display is a living instrument feedback surface, not just decoration. It should react to selected mode, key/scale, chord name, modifier state, active track/scene, transport, and Mutate movement. Explore distinct graphics for Sampler, ChordMatiK, Sequencer and Mutate; optional oscilloscope/waveform visualization and a playful low-poly 3D cat mascot may be explored as concepts. Preserve readable status overlays, PS1-era low-poly aesthetics, and performance on iPad. No specific cat appearance, animation or scope has been approved.
