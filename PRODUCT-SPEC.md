@@ -29,10 +29,13 @@ Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note
 ### ChordMatiK key and scale — approved
 The seven chord pads are diatonic to a selected root key and selectable **Major / Minor** scale mode. Switching scale mode updates the available chord qualities while keeping the compact seven-pad performance surface. Minor offers **Natural Minor (default)** and **Harmonic Minor**. Both derive the seven diatonic chord pads from the selected root and scale. The scale-selector UX, pad arrangement, and handling of key/scale changes during playback remain open.
 
+### ChordMatiK physical layout — approved
+Retain the existing **3 upper + 4 lower** staggered seven-pad layout (Layout A). Optimize for right-hand playing while the left hand operates the persistent X/Y joystick. Physical iPad ergonomics, touch target sizing, pad-to-degree mapping and modifier placement remain to be validated or decided.
+
 ### ChordMatiK interaction — approved in part
 - **Modifiers:** Short tap toggles/latches a modifier; long press activates it temporarily for the duration of the hold. The exact threshold and interaction conflicts require further design.
 - **Mono chord behavior:** Chord notes are arpeggiated sequentially on Mono tracks. The arp pattern, rate, note-off and retrigger behavior are not yet defined.
-- **Seven-pad mapping:** Seven key/scale-relative diatonic chord pads are approved; their precise physical arrangement and chord-label presentation are not yet finalized. Do not treat the current prototype layout as a final decision.
+- **Seven-pad mapping:** Seven key/scale-relative diatonic chord pads are approved; the 3+4 physical arrangement is approved, while degree-to-pad mapping and chord-label presentation remain to be finalized. Do not treat the current prototype layout as a final decision.
 
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
