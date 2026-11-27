@@ -127,3 +127,9 @@ The supplied HTML fills empty slots with predefined labels and plays oscillators
 - **Recording:** Keep actual absolute MIDI note pitches in existing live-recorded step events; do not re-harmonize recorded pitches when KEY/SCALE changes.
 - **Scope control:** This resolves the crossfade/One-shot conflict for PR04. PR05 still owns sequencer clock and sample-based step playback. Precise fades, touch threshold, root pitch calibration and extended chord spelling are implementation tuning / QA topics, not additional approved features.
 - **Contract:** `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
+
+## Approved — Development order and Sample Editing placement (2026-11-28)
+- **Keep PR05 as the real sample-based Sequencer.** Do not move Sample Editing ahead of PR05 or silently renumber PR06/PR07.
+- **Sample Editing remains committed product scope** in a dedicated post-PR05 work item, with PR identifier to be assigned during planning. Approved capabilities: non-destructive TRIM, PITCH, VOLUME and REVERSE; preserve original user audio and allow edits to be revised/reset.
+- Waveform presentation, trim handles, editing ranges, preview behavior, parameter storage, and interaction with playback require a separate UX/design round before an Antigravity implementation contract. No new editor UX details are approved by this scheduling decision.
+- Documentation planning is authorized; implementation and merge are not.
