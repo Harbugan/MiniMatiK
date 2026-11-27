@@ -45,11 +45,16 @@
 - Harmonic Minor is an explicit alternative; selecting it changes the scale-derived chord qualities.
 - The exact scale-selector UX and behavior for changing scale while notes or sequences are playing remain open.
 
+## Approved — ChordMatiK physical pad layout (2026-11-27)
+- **Layout A approved:** retain the prototype's staggered **3 upper + 4 lower** chord-pad arrangement.
+- This approves the physical arrangement, not final pad-to-degree mapping, touch target dimensions, or modifier placement.
+- Design for right-hand chord performance while the left hand operates the always-visible X/Y joystick; validate on a physical 11-inch iPad.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK seven-button mapping and visual arrangement; scale-selector UX, chord voicing, modifier types, Mono arpeggio rate/pattern, Poly voice limits and voice stealing.
+- ChordMatiK seven-button degree-to-pad mapping and modifier placement; scale-selector UX, chord voicing, modifier types, Mono arpeggio rate/pattern, Poly voice limits and voice stealing.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
