@@ -17,6 +17,12 @@ Status legend: PLANNED / IN PROGRESS / QA / DONE. No implementation is approved 
 ## Phase 4 — Finish
 - **PR06 — Persistence and polish:** Local project save/load, portable sample data, touch and audio QA, low-poly visuals. **PLANNED**
 
+## Implementation readiness — 2026-11-27
+- **PR01:** Baseline HTML and documentation committed to main; physical iPad QA remains pending. No implementation PR has been merged.
+- **PR02:** Ready for Antigravity Task Contract in `TASKS/PR02-REAL-SOUNDBANK.md`. Scope is real file import, microphone recording, sample preview, clear, and safe routing; not ChordMatiK, sequencer, editing DSP or persistence.
+- **PR03:** ChordMatiK behavior specified, but depends on PR02 and explicit resolution of chord crossfade vs ordinary One-shot triggers.
+- **Visual discovery:** PS1 display expression, oscilloscope and optional low-poly cat are separate design tasks, not PR02 requirements.
+
 ## Release gates
 Every PR: narrow scope, implementation summary, test notes, known limitations, owner approval, physical iPad QA when applicable, and explicit merge approval.
 
