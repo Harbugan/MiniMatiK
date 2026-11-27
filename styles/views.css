@@ -30,7 +30,7 @@ canvas#ps1Canvas {
   image-rendering: crisp-edges;
 }
 
-/* ChordMatiK Ergonomic 7-Button Keys */
+/* ChordMatiK Ergonomic 7-Button Keys & Multi-Touch Modifiers */
 .chord-key-lower {
   background: linear-gradient(180deg, #f8f5ed 0%, #ded8c6 100%);
   color: #181a1d;
@@ -40,6 +40,7 @@ canvas#ps1Canvas {
     0 7px 10px rgba(0, 0, 0, 0.55),
     inset 0 2px 0 #ffffff;
   transition: transform 0.05s ease, box-shadow 0.05s ease;
+  touch-action: none;
 }
 .chord-key-lower:active, .chord-key-lower.key-fired {
   transform: translateY(4px);
@@ -57,9 +58,21 @@ canvas#ps1Canvas {
     0 7px 10px rgba(0, 0, 0, 0.65),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: transform 0.05s ease, box-shadow 0.05s ease;
+  touch-action: none;
 }
 .chord-key-upper:active, .chord-key-upper.key-fired {
   transform: translateY(4px);
   background: linear-gradient(180deg, #ea493a 0%, #b5271a 100%);
   box-shadow: 0 1px 0 #0d0e10, inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
+
+.cm-mod-btn {
+  touch-action: none;
+}
+
+.cm-strum-slider {
+  accent-color: var(--te-orange);
+  height: 18px;
+  touch-action: none;
+}
+

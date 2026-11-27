@@ -92,7 +92,13 @@ test('entry point moved to index.html and all local CSS/JS references exist', ()
 test('ES module dependency graph under js/ has valid imports and zero circular dependencies', () => {
   const jsDir = path.join(REPO_ROOT, 'js');
   const jsFiles = listFiles(jsDir, '.js');
-  assert.equal(jsFiles.length, 12, 'Expected 12 ES modules under js/');
+  assert.equal(jsFiles.length, 14, 'Expected 14 ES modules under js/ (12 PR03 + 2 PR04)');
+
+  const cmSource = fs.readFileSync(path.join(jsDir, 'chordmatik.js'), 'utf8');
+  assert.doesNotMatch(cmSource, /playMutatedVoice|createOscillator/, 'ChordMatiK must never use legacy oscillator playback');
+
+  const voiceEngineSource = fs.readFileSync(path.join(jsDir, 'sample-voice-engine.js'), 'utf8');
+  assert.doesNotMatch(voiceEngineSource, /createOscillator/, 'Sample voice engine must never synthesize fallback oscillators');
 
   const graph = new Map();
   for (const file of jsFiles) {

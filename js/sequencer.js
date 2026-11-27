@@ -5,7 +5,7 @@
  * scene copy, transport PLAY/STOP/LIVE REC, and step-resolution X/Y automation replay.
  */
 import { state, ROOT_NOTES } from './state.js';
-import { playClick, playMutatedVoice } from './audio.js';
+import { playClick, playMutatedVoice, stopAllPerformanceAudio } from './audio.js';
 import { updateAllHUD } from './display.js';
 import { setJoystickPosition } from './mutate.js';
 
@@ -181,6 +181,7 @@ export function initSequencer() {
 
   document.getElementById('btnStop').addEventListener('click', () => {
     stopTransport(true);
+    stopAllPerformanceAudio();
     playClick(400);
   });
 

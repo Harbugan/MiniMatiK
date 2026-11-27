@@ -18,7 +18,7 @@ import {
 import { decodeFile, decodeRecordedBlob } from './sample-decoder.js';
 import { checkRecordingSupport, createRecorderController } from './sample-recorder.js';
 import { createSamplePreviewPlayer } from './sample-preview.js';
-import { audioCtxManager } from './audio.js';
+import { audioCtxManager, sampleVoiceEngine } from './audio.js';
 import { updateAllHUD } from './display.js';
 
 let onTracksChangedCallback = () => {};
@@ -374,6 +374,9 @@ export function openSamplerOverlay(mode, slotIdx) {
         const res = assignSlotToTrack(state.soundbank, state.tracks, slotIdx, trkIdx);
         closeSamplerOverlay();
         if (res.assigned) {
+          if (res.replaced) {
+            sampleVoiceEngine.stopTrack(trkIdx);
+          }
           const msg = res.replaced
             ? `Assigned S${slotNum} "${slot.name}" → T${trk.id} (replaced S${formatSlotNumber(res.previousSlot)}).`
             : `Assigned S${slotNum} "${slot.name}" → T${trk.id}.`;
@@ -743,6 +746,9 @@ export function initSampler({ onTracksChanged } = {}) {
       samplePreview.stop();
     }
     const res = clearSlot(state.soundbank, state.tracks, slotIdx);
+    for (const trackIdx of res.unassignedTracks) {
+      sampleVoiceEngine.stopTrack(trackIdx);
+    }
     closeSamplerOverlay();
     if (res.cleared) {
       const trackMsg = res.unassignedTracks.length > 0

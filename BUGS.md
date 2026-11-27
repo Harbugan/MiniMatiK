@@ -10,14 +10,19 @@ No physical iPad QA has been reported yet. Automated Node unit tests and Chromiu
 - Hybrid auto-assignment (empty active track only), manual `ASSIGN → T1–T7`, and destructive `CLR` confirmation are wired to header, track bar, and PS1 monitor state.
 - PR03 modular refactor splits the monolithic HTML into `index.html`, `styles/*.css`, and native browser ES modules under `js/*.js`, and updates NordicWay FTPS deployment for multi-file assets without behavioral or visual changes.
 
+## Implemented in PR04 (pending physical iPad QA & owner acceptance)
+- `02.CHORDMATIK` plays real decoded user `AudioBuffer` voices from the active track's assigned soundbank slot via `js/sample-voice-engine.js` with zero oscillator fallback (empty/unassigned/muted tracks are silent).
+- Supports all 12 chromatic keys, Major / Natural Minor (default minor) / Harmonic Minor scales, stackable Hold+Toggle modifiers (`7TH`, `SUS4`, `9TH`, `STRUM`) above the staggered 3+4 pads, adjustable Low-to-High STRUM (`20–150 ms`), Mono Up 1/8-note arpeggio, per-track `1-SHOT`/`GATE` and `POLY`/`MONO`, Smart Chord Priority (Option A) crossfades, 8-voice per-track cap (1 in Mono), and absolute MIDI pitch storage during live REC.
+- Fixed sample pitch reference is currently `C4` (`MIDI 60`, Tape playback-rate transposition); user-configurable sample root-key calibration and true time-preserving Stretch DSP remain separate future tasks.
+- `DRUM` submode triggers the active track's single assigned sample at fixed semitone offsets around native pitch (`0st` on pad 1) rather than synthesizing seven factory drums.
+
 ## Remaining legacy prototype behavior & known gaps
-- **Legacy synth playback in ChordMatiK & SEQ-16:** `02.CHORDMATIK` pads, `03.SEQ-16` step triggers, `RND PAT`, and sequencer playback still invoke temporary legacy oscillator audio (`playMutatedVoice`) rather than playing assigned soundbank samples. Real sample playback for ChordMatiK and SEQ-16 is scoped to PR04 and PR05.
-- Sequencer uses `setInterval`, which may exhibit timing jitter.
-- Automation records at step resolution rather than continuous movement.
-- BPM changes restart playback from step 1.
-- No project persistence: imported and recorded soundbank samples live in memory only and reset on page reload.
-- Physical iPad Safari layout, touch targets, file picker behavior, microphone permissions/codecs, and simultaneous multi-touch remain unverified on hardware.
-- ChordMatiK `MIN/INV` currently toggles major/minor quality rather than implementing approved PR04 scale/STRUM decisions.
+- **Legacy synth playback in SEQ-16:** `03.SEQ-16` step triggers, `RND PAT`, and sequencer playback still invoke temporary legacy oscillator audio (`playMutatedVoice`) rather than playing assigned soundbank samples. Sample-based sequencer scheduling is scoped to PR05.
+- Sequencer uses `setInterval`, which may exhibit timing jitter (PR05).
+- Automation records at step resolution rather than continuous movement (PR06).
+- BPM changes restart sequencer playback from step 1 (PR05).
+- No project persistence: imported and recorded soundbank samples live in memory only and reset on page reload (PR07).
+- Physical iPad Safari layout, touch targets, file picker behavior, microphone permissions/codecs, audio crossfade/voice-stealing feel, and simultaneous multi-touch for PR04 remain to be verified on hardware.
 - Microphone capture requires a secure context (`HTTPS` or `localhost`) in Safari and Chromium.
 - Native ES modules require serving `index.html` over HTTP/HTTPS (opening `index.html` directly via `file://` is blocked by browser CORS policies).
 

@@ -10,6 +10,7 @@ import { updateAllHUD } from './display.js';
 
 let joystickWell = null;
 let joystickCap = null;
+let activeJoystickPointerId = null;
 
 export function setJoystickPosition(nx, ny) {
   // Clamp within unit circle
@@ -93,22 +94,33 @@ export function initMutate({ onAutomationCleared } = {}) {
 
   if (joystickWell) {
     joystickWell.addEventListener('pointerdown', (e) => {
+      if (activeJoystickPointerId !== null) return;
+      e.preventDefault();
+      activeJoystickPointerId = e.pointerId;
       state.joystick.isDragging = true;
-      joystickWell.setPointerCapture(e.pointerId);
+      if (typeof joystickWell.setPointerCapture === 'function') {
+        try { joystickWell.setPointerCapture(e.pointerId); } catch (_) {}
+      }
       handleJoystickPointer(e.clientX, e.clientY);
     });
 
     joystickWell.addEventListener('pointermove', (e) => {
-      if (!state.joystick.isDragging) return;
+      if (!state.joystick.isDragging || e.pointerId !== activeJoystickPointerId) return;
       handleJoystickPointer(e.clientX, e.clientY);
     });
 
-    joystickWell.addEventListener('pointerup', () => {
+    const releaseJoystick = (e) => {
+      if (e.pointerId !== activeJoystickPointerId) return;
+      activeJoystickPointerId = null;
       state.joystick.isDragging = false;
       if (state.joystick.springReturn) {
         setJoystickPosition(0, 0);
       }
-    });
+    };
+
+    joystickWell.addEventListener('pointerup', releaseJoystick);
+    joystickWell.addEventListener('pointercancel', releaseJoystick);
+    joystickWell.addEventListener('lostpointercapture', releaseJoystick);
   }
 
   document.querySelectorAll('.x-target-btn').forEach(btn => {
