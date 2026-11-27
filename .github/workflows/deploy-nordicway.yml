@@ -1,0 +1,54 @@
+name: Deploy MiniMatik to NordicWay
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'minimatik.html'
+      - '.github/workflows/deploy-nordicway.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: minimatik-nordicway-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload MiniMatik via FTPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate credentials and entry point
+        env:
+          FTP_USER: ${{ secrets.NORDICWAY_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NORDICWAY_FTP_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$FTP_USER" || { echo "::error::Missing NORDICWAY_FTP_USER"; exit 1; }
+          test -n "$FTP_PASSWORD" || { echo "::error::Missing NORDICWAY_FTP_PASSWORD"; exit 1; }
+          test -f minimatik.html || { echo "::error::Missing minimatik.html"; exit 1; }
+
+      - name: Upload MiniMatik entry point
+        env:
+          FTP_USER: ${{ secrets.NORDICWAY_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NORDICWAY_FTP_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Uploading minimatik.html as index.html to MiniMatik directory"
+          curl --fail --show-error --silent --retry 2 \
+            --ssl-reqd --ftp-pasv --ftp-create-dirs \
+            --user "$FTP_USER:$FTP_PASSWORD" \
+            --upload-file minimatik.html \
+            "ftp://cp17.nordicway.dk//public_html/Projects/MiniMatik/index.html"
+          echo "MiniMatik deployment completed (no remote deletions)."
