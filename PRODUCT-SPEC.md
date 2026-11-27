@@ -27,7 +27,7 @@ Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new 
 Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, voicing and modifier semantics require review; Mono/Poly capability is approved, but voice limits and interactions remain open.
 
 ### ChordMatiK key and scale — approved
-The seven chord pads are diatonic to a selected root key and selectable **Major / Minor** scale mode. Switching scale mode updates the available chord qualities while keeping the compact seven-pad performance surface. The exact minor-scale variant, pad arrangement and handling of key/scale changes during playback are still open.
+The seven chord pads are diatonic to a selected root key and selectable **Major / Minor** scale mode. Switching scale mode updates the available chord qualities while keeping the compact seven-pad performance surface. Minor offers **Natural Minor (default)** and **Harmonic Minor**. Both derive the seven diatonic chord pads from the selected root and scale. The scale-selector UX, pad arrangement, and handling of key/scale changes during playback remain open.
 
 ### ChordMatiK interaction — approved in part
 - **Modifiers:** Short tap toggles/latches a modifier; long press activates it temporarily for the duration of the hold. The exact threshold and interaction conflicts require further design.
