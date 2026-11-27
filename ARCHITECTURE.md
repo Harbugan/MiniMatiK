@@ -36,3 +36,10 @@ Keep UI and audio concerns separable when implementation begins. Avoid blocking 
 - Track voice ownership by track, group and pointer so Gate release, track mute, sample clear, mode change and global stop do not leave stuck notes. Use `AudioContext.currentTime` for scheduling, never DOM frame cadence.
 - Retain legacy `playMutatedVoice` only for still-unmigrated SEQ-16 prototype calls until PR05; never use it as a ChordMatiK fallback. Avoid circular module dependencies.
 - PR04 must not claim true time-preserving Stretch, sample root-key detection, sample editing or sequencer audio-clock migration. Treat tuning constants as QA parameters and document limitations.
+
+## PR05 planned sequencer architecture — approved design, not implemented
+- Replace `js/sequencer.js` legacy `setInterval` and `playMutatedVoice` with deterministic Web Audio-clock lookahead scheduling of the seven tracks' assigned user samples. Share PR04 sample-voice lifecycle/voice caps; do not build a parallel competing audio engine.
+- Extend scene-step representation from a single `midiNotes` list to multiple independent note events with absolute MIDI pitches, per-event onset timing and recorded duration. Provide migration from existing `{active,midiNotes,autoX,autoY}` steps without losing manually entered notes or step automation.
+- Implement Q ON/OFF as recording-time quantization, continuous overdub across bar boundaries, and note-on/off pairing (including long notes crossing loop boundaries). Keep existing 16-step grid primary and expose per-event editing through Note Detail.
+- Queue scene switches to the next bar boundary during transport and support whole-scene copy to selected destination with overwrite protection. Cancel unsounded outgoing scene events at switch; do not duplicate step-1 scheduling.
+- Preserve existing PR04 ChordMatiK performance, iPad multi-touch, sample assignment and PR06 step-level X/Y automation boundaries. This section documents a target, not verified implementation. Contract: `TASKS/PR05-REAL-SEQUENCER.md`.
