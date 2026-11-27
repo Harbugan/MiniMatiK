@@ -69,11 +69,30 @@
 - The seven-pad layout and four modifiers remain unchanged. Speed adjustment should not require an additional performance pad.
 - Exact speed range, default, direction, and how the control is exposed remain open for the consolidated ChordMatiK design review.
 
+
+## Approved — ChordMatiK consolidated design (2026-11-27)
+- **Chord switching:** Smart switching; a newly triggered chord takes priority over the previous chord. This is separate from per-track Poly voice mode. Exact release/cut behavior remains to be tuned.
+- **Pad mapping:** Keep the current mapping: upper row **ii / iii / vi**; lower row **I / IV / V / vii°**. Degree labels adapt to selected scale (e.g. minor i, ii°, III, iv, v/V, VI, VII/vii°).
+- **Key/scale UI:** Compact **KEY + SCALE** controls in the ChordMatiK workspace. Scale options: Major, Natural Minor (default minor), Harmonic Minor.
+- **Modifier combinations:** Limited combinations; 7TH and 9TH may combine, SUS4 replaces the third. Exact seventh/ninth chord-voicing rules need musical QA.
+- **STRUM:** Slow–Fast slider, ascending **Low → High** note order. Speed range/default are implementation tuning items; the slider does not add a performance pad.
+- **Mono arp:** Ascending **Up**, tempo-synced **1/8 notes**. On Mono tracks the arpeggio takes priority over STRUM; STRUM is a Poly articulation.
+- **Poly voice cap:** Maximum **8 simultaneous voices per track**. Voice-stealing strategy and cross-track budget need implementation/QA definition.
+- **Key/scale change while playing:** Existing sounding voices continue unchanged; the next chord trigger uses the newly selected key/scale. Recorded events and sequence behavior require separate definition.
+- **Left display direction:** The PS1-style screen should visibly reflect modes, parameter choices, live playing, and musical expression; explore mode-specific graphics, an oscilloscope-style visualization, and an optional low-poly 3D cat mascot. These are creative directions, **not** approval of a specific mascot design, animation, or visualization implementation.
+
+## Pending ChordMatiK implementation details / acceptance clarifications
+- Smart switching must not silently contradict One-shot playback: define whether outgoing voices are released, faded, or allowed to finish, and how this differs in Gate mode.
+- Specify whether the STRUM slider modifies a latched STRUM modifier and whether modifiers may stack with STRUM.
+- Resolve exact chord spellings across Major, Natural Minor, Harmonic Minor (especially 7TH/9TH/SUS4), touch hold threshold, arpeggio note length/retrigger, and 8-voice stealing.
+- Define recorded note representation (absolute MIDI notes vs degree/key/scale metadata) and response to key changes during sequencer playback.
+- Display concepts require separate UX direction, performance budgets and physical iPad validation; do not add mascot or scope-heavy visual effects without approval.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK seven-button degree-to-pad mapping; scale-selector UX, chord voicing, STRUM speed range/default, direction, modifier combinations and Mono arpeggio interaction, Poly voice limits and voice stealing.
+- ChordMatiK remaining acceptance details listed above (voice release, modifier stacking, voicing, event representation and voice stealing).
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
