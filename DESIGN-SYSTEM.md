@@ -12,5 +12,8 @@ Chakra Petch, Inter, JetBrains Mono, Noto Sans JP. These are currently fetched f
 ## Layout principles
 11-inch iPad landscape, 100vw x 100vh, no page scroll. Left context display, right mode-specific workspace, persistent bottom bar for X/Y joystick, seven tracks, and transport. Touch targets, simultaneous multi-touch, and responsive fit require physical iPad verification.
 
+## ChordMatiK layout — approved
+Keep the staggered **3 upper + 4 lower** chord pads. Place a compact row of four modifier controls **above** the chord pads: **7TH / SUS4 / 9TH / STRUM**. The former MIN/INV modifier is superseded. Preserve the persistent bottom-left X/Y joystick for left-hand performance while the right hand operates the chord area. Verify modifier reach and multi-touch ergonomics on a physical iPad.
+
 ## Change control
 Treat the handed-over HTML as the visual baseline. No cosmetic redesign without an approved design decision. Preserve identity and functional hierarchy over decorative additions.
