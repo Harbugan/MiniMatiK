@@ -28,11 +28,16 @@
 - **Voice modes:** Support both **Mono** and **Poly** playback, selectable per track.
 - These are target product requirements, not current prototype capabilities. Exact switching UI, gate note-off behavior, stretching algorithm, voice limits and voice stealing remain open.
 
+## Approved — ChordMatiK design round 1 (partial, 2026-11-27)
+- **Modifier interaction:** Hold + Toggle. Short tap latches a modifier; long press applies it temporarily while held. Exact long-press threshold and conflict behavior remain open.
+- **Mono chord performance:** Arpeggio. When a chord is triggered on a Mono track, its notes are played sequentially rather than simultaneously. Arpeggio pattern/rate/retrigger rules remain open.
+- **Seven-button mapping:** NOT YET DECIDED. Review the real HiChord behavior before choosing MiniMatik's mapping. Do not assume the prototype's seven diatonic chords have been approved as final.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- Exact ChordMatiK modifier semantics, chord voicing, Mono/Poly voice limits and voice stealing.
+- ChordMatiK seven-button mapping; chord voicing, modifier types, Mono arpeggio rate/pattern, Poly voice limits and voice stealing.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
