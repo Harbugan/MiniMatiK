@@ -11,6 +11,14 @@ Single HTML document with inline CSS/JavaScript and Tailwind CDN. In-memory stat
 5. Mutate: per-track or global DSP routing to be decided, with replayable automation.
 6. Persistence: portable project representation with samples, scene data and automation.
 
+## Final audio decisions — 2026-11-27
+- Default One-shot/Tape/Poly; support Gate note-off and non-destructive editing.
+- Chord switching crossfades; preserve ordinary One-shot playback semantics pending explicit PR03 resolution.
+- Enforce eight voices per track; steal oldest with a short click-safe fade.
+- Record absolute triggered MIDI pitches in live chord events. Key/scale changes apply only to subsequent live triggers.
+- STRUM note-on spacing approximately 20–150 ms, Low → High, with a compact slider; Mono uses BPM-synced Up 1/8 arp.
+- Scope these features to later audio-engine PRs; PR02 only establishes sample acquisition, preview and routing.
+
 ## Engineering boundaries
 Keep UI and audio concerns separable when implementation begins. Avoid blocking audio on visual rendering. Respect iOS audio unlock and microphone permissions. Do not introduce silent fallbacks to factory oscillators. Specify migrations and test strategy before refactoring the baseline.
 
