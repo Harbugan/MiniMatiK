@@ -30,7 +30,10 @@ Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note
 The seven chord pads are diatonic to a selected root key and selectable **Major / Minor** scale mode. Switching scale mode updates the available chord qualities while keeping the compact seven-pad performance surface. Minor offers **Natural Minor (default)** and **Harmonic Minor**. Both derive the seven diatonic chord pads from the selected root and scale. The scale-selector UX, pad arrangement, and handling of key/scale changes during playback remain open.
 
 ### ChordMatiK physical layout — approved
-Retain the existing **3 upper + 4 lower** staggered seven-pad layout (Layout A). Optimize for right-hand playing while the left hand operates the persistent X/Y joystick. Physical iPad ergonomics, touch target sizing, pad-to-degree mapping and modifier placement remain to be validated or decided.
+Retain the existing **3 upper + 4 lower** staggered seven-pad layout (Layout A). Optimize for right-hand playing while the left hand operates the persistent X/Y joystick. The four modifier controls sit above the chord pads. Physical iPad ergonomics and touch target sizing require validation; pad-to-degree mapping remains open.
+
+### ChordMatiK modifier set and placement — approved
+Four modifier controls: **7TH**, **SUS4**, **9TH**, and **STRUM**, arranged **above** the staggered 3+4 chord pads. STRUM replaces the prototype's MIN/INV control; inversion is not a dedicated performance modifier. STRUM offsets chord-note attacks to create a strummed articulation. Exact timing, direction, modifier combinations and behavior with Mono arpeggio remain open.
 
 ### ChordMatiK interaction — approved in part
 - **Modifiers:** Short tap toggles/latches a modifier; long press activates it temporarily for the duration of the hold. The exact threshold and interaction conflicts require further design.
