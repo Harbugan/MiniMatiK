@@ -52,6 +52,17 @@ Four modifier controls: **7TH**, **SUS4**, **9TH**, and **STRUM**, arranged **ab
 - **Live key/scale changes:** Apply to the next triggered chord; already sounding voices are not retuned. Sequencer event representation and re-harmonization behavior remain open.
 - **Implementation status:** These are approved requirements, not features already present in minimatik.html.
 
+### Final approved sampler and ChordMatiK behavior — 2026-11-27
+- Default sound playback configuration: **One-shot / Tape / Poly**.
+- One-shot plays through to the sample end; Gate ends on note release with click-safe treatment.
+- Manual routing: **ASSIGN → T1–T7** after selecting a sample. Auto-assignment applies only when the active track is empty.
+- Chord changes use a **short crossfade**. Exact interaction with One-shot playback remains a documented PR03 approval item; do not silently truncate ordinary One-shot triggers.
+- Maximum eight concurrent voices per track; on overflow the **oldest voice is replaced** with click-safe release.
+- 7TH, 9TH and STRUM can stack; SUS4 replaces the third. Chord spelling and modifier interactions require musical QA.
+- Live chord recording stores **actual note pitches**; future changes to KEY/SCALE do not retroactively transpose recorded notes.
+- STRUM uses a **Slow–Fast slider**, approximately **20–150 ms between notes**, ascending Low → High; Mono Up 1/8 arp takes precedence over STRUM.
+- These are future requirements, not features delivered by the baseline prototype.
+
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
 
