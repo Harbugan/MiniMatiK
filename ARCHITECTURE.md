@@ -13,7 +13,7 @@ Modular browser workspace anchored at `index.html` with Tailwind CDN, four respo
 
 ## Final audio decisions — 2026-11-27
 - Default One-shot/Tape/Poly; support Gate note-off and non-destructive editing.
-- Chord switching crossfades; preserve ordinary One-shot playback semantics pending explicit PR03 resolution.
+- Smart Chord Priority (Option A) approved for PR04: CHORD groups crossfade on replacement even in One-shot; independent NOTE/DRUM One-shots play out subject to voice cap.
 - Enforce eight voices per track; steal oldest with a short click-safe fade.
 - Record absolute triggered MIDI pitches in live chord events. Key/scale changes apply only to subsequent live triggers.
 - STRUM note-on spacing approximately 20–150 ms, Low → High, with a compact slider; Mono uses BPM-synced Up 1/8 arp.
@@ -26,6 +26,13 @@ Keep UI and audio concerns separable when implementation begins. Avoid blocking 
 ## ChordMatiK implementation constraints (approved requirements, technical design pending)
 - Derive chords from selected key and Major/Natural Minor/Harmonic Minor scale; keep the 3+4 physical mapping stable.
 - Schedule Mono Up arpeggio on an audio clock at 1/8-note resolution; STRUM applies to Poly only and uses adjustable Low-to-High note offsets.
-- Enforce eight simultaneous voices per track in Poly, with a documented voice-stealing policy; define outgoing chord handling against One-shot/Gate before implementation.
-- Key/scale changes affect future chord triggers without retuning active voices. Determine how recorded sequencer notes retain or resolve pitch.
+- Enforce eight simultaneous voices per track in Poly including outgoing tails, stealing the oldest; outgoing CHORD groups crossfade on replacement (Smart Chord Priority Option A), while independent One-shots finish naturally. Gate releases on pad-up.
+- Key/scale changes affect future chord triggers without retuning active voices. Live REC retains absolute MIDI pitches; PR05 defines playback/editing semantics.
 - Treat the PS1 canvas as non-blocking visualization; audio processing must not depend on its frame rate. Mode-reactive visuals, oscilloscope and mascot are discovery items, not implementation requirements.
+
+## PR04 planned module boundary — approved design, not implemented
+- ChordMatiK UI and musical note calculation belong in `js/chordmatik.js` or small pure helper modules. Assigned user-sample voice creation, gain envelopes, track budgets, and group lifecycle belong in a dedicated performance/audio module using the existing shared AudioContext and decoded `AudioBuffer` references.
+- Model each CHORD press as a cancellable performance group. On replacement, cancel pending note starts, release active group voices with click-safe fades, and start incoming voices subject to the eight-sounding-voice cap. A releasing voice still counts until it has stopped; Mono allows no overlap.
+- Track voice ownership by track, group and pointer so Gate release, track mute, sample clear, mode change and global stop do not leave stuck notes. Use `AudioContext.currentTime` for scheduling, never DOM frame cadence.
+- Retain legacy `playMutatedVoice` only for still-unmigrated SEQ-16 prototype calls until PR05; never use it as a ChordMatiK fallback. Avoid circular module dependencies.
+- PR04 must not claim true time-preserving Stretch, sample root-key detection, sample editing or sequencer audio-clock migration. Treat tuning constants as QA parameters and document limitations.
