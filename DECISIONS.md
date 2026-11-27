@@ -13,13 +13,19 @@
 ## Approved — Sampler design round 1 (2026-11-27)
 - Tapping an empty soundbank slot offers two actions: **Record** or **Import**.
 - Sample editing provides **Trim**, **Pitch**, **Volume**, and **Reverse**.
-- Track assignment follows a **hybrid** model: the first sample is assigned automatically to the active track; subsequent assignments are manual.
+- Track assignment uses a **hybrid** model. The round-1 "first sample only" interpretation is superseded by round 2 below.
 - These are product requirements, not statements that the existing HTML prototype implements them.
 
+## Approved — Sampler design round 2 (2026-11-27)
+- **Microphone recording:** Tap **Record** to start; tap **Stop** to finish. No hold-to-record requirement.
+- **Editing:** Non-destructive. Preserve the original audio while Trim, Pitch, Volume, and Reverse are adjusted; changes must remain revisable.
+- **Hybrid track assignment (supersedes round 1 wording):** A newly acquired sample is automatically assigned to the currently active track **only if that track has no sample assignment**. If the active track already has an assignment, do not replace it automatically; the user must assign manually.
+- These decisions specify target behavior, not existing implementation.
+
 ## Open — requires explicit decision
-- Precise hybrid assignment behavior: what counts as the first sample, how to handle an already assigned active track, and reassignment interaction.
+- Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
-- Trim/pitch/volume/reverse interaction details, destructive vs non-destructive edits, and whether pitch changes duration.
+- Non-destructive editing ranges and controls, pitch/time relationship, and sample playback modes.
 - Exact ChordMatiK modifier semantics and polyphony.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
