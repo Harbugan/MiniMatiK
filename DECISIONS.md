@@ -88,11 +88,28 @@
 - Define recorded note representation (absolute MIDI notes vs degree/key/scale metadata) and response to key changes during sequencer playback.
 - Display concepts require separate UX direction, performance budgets and physical iPad validation; do not add mascot or scope-heavy visual effects without approval.
 
+## Approved — Final sampler and ChordMatiK technical decisions (2026-11-27)
+- **Smart chord switching:** Short crossfade between chord performances.
+- **One-shot / Gate:** One-shot plays the sample to its natural end; Gate stops on note release (with click-safe release treatment).
+- **Voice stealing:** When the eight-voice-per-track cap is reached, replace the oldest active voice.
+- **Modifier combinations:** 7TH + 9TH + STRUM may be combined. SUS4 replaces the third; exact combined voicing rules require validation.
+- **Live chord recording:** Store the actual triggered notes (absolute pitches), not scale-relative chord degrees.
+- **Defaults:** One-shot / Tape / Poly.
+- **Manual assignment:** Select a sample, choose **ASSIGN**, then select destination track T1–T7. An existing assignment is never overwritten automatically; an explicit assignment may replace it.
+- **STRUM speed:** Slow–Fast slider, approximately **20–150 ms between notes**. Final default and precise range are tuning parameters.
+
+## Reconciliation — documented, not silently approved
+- **Crossfade vs One-shot:** The two rules can conflict if chord switching stops a One-shot voice before completion. Proposed resolution for later PR03: crossfade applies to active chord-performance voices; ordinary One-shot triggers are allowed to finish. This exception requires product-owner approval before PR03 implementation.
+- **Mono arp vs default Poly:** No conflict: Poly is the default; selecting Mono enables the previously approved Up 1/8-note arpeggio.
+- **Eight voices vs STRUM and stacked modifiers:** Enforce eight voices per track using oldest-voice stealing, with click-safe fade. Verify dense chords and retriggers in QA.
+- **Absolute notes vs key changes:** Recorded pitches remain fixed; key/scale changes affect future live chord triggers. Exact sequencer editing semantics remain to be designed.
+- **Scope:** Real-time stretch quality, Gate release envelope, microphone permissions, persistence, and visual mascot remain outside the first implementation contract.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK remaining acceptance details listed above (voice release, modifier stacking, voicing, event representation and voice stealing).
+- ChordMatiK remaining acceptance details: One-shot/crossfade reconciliation, exact voicing and Gate release envelope; core defaults, voice stealing, recorded pitches and STRUM range are approved.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
