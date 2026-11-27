@@ -14,5 +14,9 @@ Product owner makes decisions and performs acceptance testing. ChatGPT leads pro
 ## Before implementation
 Read README.md, PRODUCT-SPEC.md, DESIGN-SYSTEM.md, DECISIONS.md, ARCHITECTURE.md, ROADMAP.md, BUGS.md. Follow the approved Task Contract. Flag ambiguities rather than inventing behavior.
 
+## PR04-specific handoff
+- Approved Smart Chord Priority (Option A) is specified in `DECISIONS.md` and `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`; follow both. A new CHORD group supersedes the previous group with a short crossfade even in One-shot, while independent NOTE/DRUM One-shots play out subject to voice limits.
+- The contract is prepared documentation, not authorization to implement. Wait for explicit owner instruction before writing code. PR04 does not include PR05 sequencer audio migration.
+
 ## Delivery contract
 One focused PR at a time. Provide changes, tests performed, known limitations, physical iPad QA checklist, and any required documentation updates. Wait for product-owner acceptance before merging. Keep documentation aligned with verified implementation, not aspirations.
