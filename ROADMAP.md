@@ -6,21 +6,23 @@ Status legend: PLANNED / IN PROGRESS / QA / DONE. No implementation is approved 
 - **PR01 — Baseline:** Commit the handed-over single-file HTML unchanged, create product documentation, and test iPad 11-inch landscape layout and touch ergonomics. **IN PROGRESS: repository setup; physical QA pending.**
 - Product design review: sampler, ChordMatiK, scene navigation, Mutate ergonomics. **PLANNED**
 
-## Phase 2 — Real sample engine
+## Phase 2 — Modular foundation and real sample engine
+- **PR03 — Modular Foundation:** Extract HTML/CSS/JS into maintainable modules and update NordicWay FTPS deployment for multi-file assets. **READY FOR HANDOFF; blocked until PR02 is merged and verified.** Contract: `TASKS/PR03-MODULAR-FOUNDATION.md`.
 - **PR02 — Soundbank:** Import audio files and record microphone input into 19 initially empty slots; preview, clear, and assign samples to seven tracks. **QA — PR open; physical iPad Safari QA and product-owner approval pending.**
-- **PR03 — ChordMatiK:** Perform pitched samples, chords and modifiers on the selected track. **PLANNED**
-- **PR04 — Sequencer:** Audio-clock-backed 16-step playback, live recording, seven tracks, and 64 scenes. **PLANNED**
+- **PR04 — ChordMatiK:** Perform pitched samples, chords and modifiers on the selected track. **PLANNED**
+- **PR05 — Sequencer:** Audio-clock-backed 16-step playback, live recording, seven tracks, and 64 scenes. **PLANNED**
 
 ## Phase 3 — Mutate
-- **PR05 — DSP and automation:** Map X/Y to real-time effects; record and replay movement; clear automation per track/scene. **PLANNED**
+- **PR06 — DSP and automation:** Map X/Y to real-time effects; record and replay movement; clear automation per track/scene. **PLANNED**
 
 ## Phase 4 — Finish
-- **PR06 — Persistence and polish:** Local project save/load, portable sample data, touch and audio QA, low-poly visuals. **PLANNED**
+- **PR07 — Persistence and polish:** Local project save/load, portable sample data, touch and audio QA, low-poly visuals. **PLANNED**
 
 ## Implementation readiness — 2026-11-27
 - **PR01:** Baseline HTML and documentation committed to main; physical iPad QA remains pending. No implementation PR has been merged.
-- **PR02:** Ready for Antigravity Task Contract in `TASKS/PR02-REAL-SOUNDBANK.md`. Scope is real file import, microphone recording, sample preview, clear, and safe routing; not ChordMatiK, sequencer, editing DSP or persistence.
-- **PR03:** ChordMatiK behavior specified, but depends on PR02 and explicit resolution of chord crossfade vs ordinary One-shot triggers.
+- **PR02:** Real Soundbank Foundation is in QA as an open PR; physical iPad Safari QA and merge approval pending. Historical contract: `TASKS/PR02-REAL-SOUNDBANK.md`.
+- **PR03:** Modular Foundation, awaiting PR02 merge; contract `TASKS/PR03-MODULAR-FOUNDATION.md`.
+- **PR04:** ChordMatiK behavior specified, but depends on real soundbank and modular foundation, plus explicit resolution of chord crossfade vs ordinary One-shot triggers.
 - **Visual discovery:** PS1 display expression, oscilloscope and optional low-poly cat are separate design tasks, not PR02 requirements.
 
 ## Release gates
@@ -31,7 +33,7 @@ See DECISIONS.md. PR numbering is provisional and may be refined before each con
 
 
 ## ChordMatiK design checkpoint — 2026-11-27
-**Product decisions substantially complete.** Approved: 3+4 layout and mapping, compact KEY + SCALE, Major/Natural Minor/Harmonic Minor, four modifiers above pads, limited modifier combinations, adjustable Low-to-High STRUM, Mono Up 1/8 arp, Smart switching, 8 voices/track, and next-trigger key/scale updates. **Not yet implementation-ready as a standalone PR:** finalize outgoing-voice behavior vs One-shot/Gate, note/voicing rules, recorded-event representation, modifier stacking and voice stealing. PR03 also depends on PR02 real sample playback.
+**Product decisions substantially complete.** Approved: 3+4 layout and mapping, compact KEY + SCALE, Major/Natural Minor/Harmonic Minor, four modifiers above pads, limited modifier combinations, adjustable Low-to-High STRUM, Mono Up 1/8 arp, Smart switching, 8 voices/track, and next-trigger key/scale updates. **Not yet implementation-ready as a standalone PR:** finalize outgoing-voice behavior vs One-shot/Gate, note/voicing rules, recorded-event representation, modifier stacking and voice stealing. ChordMatiK implementation (now planned PR04) depends on PR02 real sample playback and PR03 modular foundation.
 
 ## Display/visual feedback discovery
 **PLANNED — design only:** Explore mode-reactive PS1 low-poly visuals, chord/parameter feedback, oscilloscope-style audio visualization, and optional low-poly cat mascot. Decide visual scope separately before adding any of these to implementation contracts; preserve readability and iPad performance.
