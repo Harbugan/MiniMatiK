@@ -1,0 +1,100 @@
+name: Deploy MiniMatik PR Preview to NordicWay
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'index.html'
+      - 'styles/**'
+      - 'js/**'
+      - '.github/workflows/deploy-nordicway-preview.yml'
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Open PR number to deploy (e.g. 4)'
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: minimatik-nordicway-preview-pr-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: Deploy PR preview
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Resolve PR and validate same-repository source
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_PR: ${{ github.event.pull_request.number || inputs.pr_number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REQUESTED_PR" =~ ^[1-9][0-9]*$ ]] || { echo "::error::Invalid PR number"; exit 1; }
+          json="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$REQUESTED_PR")"
+          state="$(jq -r '.state' <<< "$json")"
+          source_repo="$(jq -r '.head.repo.full_name' <<< "$json")"
+          source_sha="$(jq -r '.head.sha' <<< "$json")"
+          target_branch="$(jq -r '.base.ref' <<< "$json")"
+          test "$state" = "open" || { echo "::error::PR is not open"; exit 1; }
+          test "$source_repo" = "$GITHUB_REPOSITORY" || { echo "::error::Fork PR previews are disabled"; exit 1; }
+          test "$target_branch" = "main" || { echo "::error::Only PRs targeting main are supported"; exit 1; }
+          [[ "$source_sha" =~ ^[a-f0-9]{40}$ ]] || { echo "::error::Invalid head SHA"; exit 1; }
+          echo "number=$REQUESTED_PR" >> "$GITHUB_OUTPUT"
+          echo "sha=$source_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.sha }}
+          persist-credentials: false
+
+      - name: Validate runtime files and create manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test -d styles
+          test -d js
+          manifest="$RUNNER_TEMP/deploy-manifest.txt"
+          {
+            echo index.html
+            find styles -type f -name '*.css' | sort
+            find js -type f -name '*.js' | sort
+          } > "$manifest"
+          test "$(grep -c '^styles/' "$manifest" || true)" -gt 0
+          test "$(grep -c '^js/' "$manifest" || true)" -gt 0
+          while IFS= read -r ref; do
+            clean="${ref#./}"
+            grep -Fxq "$clean" "$manifest" || { echo "::error::Missing asset $ref"; exit 1; }
+          done < <(grep -oE '(href|src)="\./(styles|js)/[^"]+"' index.html | sed -E 's/^(href|src)="([^"]+)"$/\2/')
+          echo "Runtime manifest:"
+          cat "$manifest"
+
+      - name: Upload isolated preview via FTPS
+        env:
+          FTP_USER: ${{ secrets.NORDICWAY_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NORDICWAY_FTP_PASSWORD }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$FTP_USER"
+          test -n "$FTP_PASSWORD"
+          base="ftp://cp17.nordicway.dk//public_html/Projects/MiniMatik/test/pr-$PR_NUMBER"
+          while IFS= read -r file; do
+            curl --fail --show-error --silent --retry 2 \
+              --ssl-reqd --ftp-pasv --ftp-create-dirs \
+              --user "$FTP_USER:$FTP_PASSWORD" \
+              --upload-file "$file" \
+              "$base/$file"
+          done < "$RUNNER_TEMP/deploy-manifest.txt"
+          echo "Preview uploaded to /Projects/MiniMatik/test/pr-$PR_NUMBER/ (no remote deletions)"
