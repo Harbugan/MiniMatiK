@@ -4,7 +4,16 @@
 MiniMatik (ミニマティック), Created by H∆RBUGΛП. English interface; 11-inch iPad landscape; full viewport.
 
 ## Soundbank
-19 slots, all empty at startup (00/19). Intended input: user-imported audio and microphone recording. Each of seven tracks references an assigned soundbank slot. No factory samples or built-in sound generators in the target product. The existing prototype's demo kit and oscillator tones are placeholders, not approved product behavior.
+19 slots, all empty at startup (00/19). Intended input: user-imported audio and microphone recording. No factory samples or built-in sound generators in the target product. The existing prototype's demo kit and oscillator tones are placeholders, not approved product behavior.
+
+### Slot acquisition — approved
+Tapping an empty slot presents **Record / Import**. A slot becomes populated only when the user records or imports an actual sample. Exact recording and import controls remain to be designed.
+
+### Sample editing — approved
+Each loaded sample supports **Trim**, **Pitch**, **Volume**, and **Reverse**. Editing semantics, ranges, playback behavior, and persistence are not yet specified.
+
+### Track assignment — approved
+Seven tracks can reference soundbank samples. **Hybrid assignment:** the first sample is automatically assigned to the active track; subsequent sample assignments are manual. Edge cases and the explicit reassignment UI require design approval before implementation.
 
 ## Performance
 Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, sample pitching, polyphony, and modifier semantics require review.
