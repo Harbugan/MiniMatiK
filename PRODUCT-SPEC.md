@@ -7,13 +7,15 @@ MiniMatik (ミニマティック), Created by H∆RBUGΛП. English interface; 1
 19 slots, all empty at startup (00/19). Intended input: user-imported audio and microphone recording. No factory samples or built-in sound generators in the target product. The existing prototype's demo kit and oscillator tones are placeholders, not approved product behavior.
 
 ### Slot acquisition — approved
-Tapping an empty slot presents **Record / Import**. A slot becomes populated only when the user records or imports an actual sample. Exact recording and import controls remain to be designed.
+Tapping an empty slot presents **Record / Import**. A slot becomes populated only when the user records or imports an actual sample.
+
+**Record flow:** Tap **Record** to start microphone capture, then tap **Stop** to finish. Capture UX, permissions, monitoring, sample limits and error handling remain to be designed.
 
 ### Sample editing — approved
-Each loaded sample supports **Trim**, **Pitch**, **Volume**, and **Reverse**. Editing semantics, ranges, playback behavior, and persistence are not yet specified.
+Each loaded sample supports **Trim**, **Pitch**, **Volume**, and **Reverse**. Editing is **non-destructive**: retain the original audio and represent edits as adjustable settings rather than irreversibly overwriting the source. Editing controls, ranges, and pitch/time semantics remain to be designed.
 
 ### Track assignment — approved
-Seven tracks can reference soundbank samples. **Hybrid assignment:** the first sample is automatically assigned to the active track; subsequent sample assignments are manual. Edge cases and the explicit reassignment UI require design approval before implementation.
+Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new sample is acquired, automatically assign it to the active track **if and only if that track is unassigned**. If the active track already has a sample, preserve that assignment and require an explicit manual assignment action. This rule supersedes the earlier "first sample only" wording. The manual assignment UI remains open.
 
 ## Performance
 Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, sample pitching, polyphony, and modifier semantics require review.
