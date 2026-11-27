@@ -15,7 +15,7 @@ Tapping an empty slot presents **Record / Import**. A slot becomes populated onl
 Each loaded sample supports **Trim**, **Pitch**, **Volume**, and **Reverse**. Editing is **non-destructive**: retain the original audio and represent edits as adjustable settings rather than irreversibly overwriting the source. Editing controls, ranges, and pitch/time semantics remain to be designed.
 
 ### Track assignment — approved
-Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new sample is acquired, automatically assign it to the active track **if and only if that track is unassigned**. If the active track already has a sample, preserve that assignment and require an explicit manual assignment action. This rule supersedes the earlier "first sample only" wording. The manual assignment UI remains open.
+Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new sample is acquired, automatically assign it to the active track **if and only if that track is unassigned**. If the active track already has a sample, preserve that assignment and require an explicit manual assignment action. This rule supersedes the earlier "first sample only" wording. Manual assignment is implemented as `ASSIGN → T1–T7` in PR02.
 
 ### Sample playback — approved
 - **One-shot / Gate:** Selectable sample playback modes. One-shot triggers playback of the sample without requiring a sustained press; Gate follows the held input, subject to the sample's available duration. Exact note-off and looping behavior are open.
@@ -44,11 +44,11 @@ Four modifier controls: **7TH**, **SUS4**, **9TH**, and **STRUM**, arranged **ab
 ### ChordMatiK consolidated behavior — approved
 - **Seven-pad mapping:** Upper row ii / iii / vi; lower row I / IV / V / vii°. Roman numerals and chord names adapt to the selected Major, Natural Minor or Harmonic Minor scale.
 - **Key and scale:** Compact KEY + SCALE controls within ChordMatiK. Natural Minor is the default Minor variant.
-- **Smart switching:** A new chord takes priority over the previous chord; this does not disable Poly playback of multiple notes within a chord. Outgoing-voice release policy must be specified against One-shot/Gate semantics.
+- **Smart switching:** A new chord takes priority over the previous chord; this does not disable Poly playback of multiple notes within a chord. Outgoing-voice policy is resolved under PR04 Smart Chord Priority (see below).
 - **Modifier combinations:** 7TH + 9TH is allowed; SUS4 replaces the chord third. Exact voicing conventions remain subject to musical QA. Modifier interactions retain approved short-tap latch / long-hold momentary behavior.
 - **STRUM:** Adjustable Slow–Fast slider; play chord tones Low → High. On Mono tracks, the Up 1/8-note arpeggio takes precedence; STRUM affects Poly chord articulation.
 - **Mono arpeggio:** Ascending, BPM-synced eighth notes.
-- **Poly voice cap:** Up to eight simultaneously sounding voices per track. Voice allocation/stealing and total system performance budget remain to be designed.
+- **Poly voice cap:** Up to eight simultaneously sounding voices per track. Oldest-voice stealing is approved; total cross-track performance budget remains to be measured.
 - **Live key/scale changes:** Apply to the next triggered chord; already sounding voices are not retuned. Sequencer event representation and re-harmonization behavior remain open.
 - **Implementation status:** These are approved requirements, not features already present in minimatik.html.
 
@@ -56,12 +56,21 @@ Four modifier controls: **7TH**, **SUS4**, **9TH**, and **STRUM**, arranged **ab
 - Default sound playback configuration: **One-shot / Tape / Poly**.
 - One-shot plays through to the sample end; Gate ends on note release with click-safe treatment.
 - Manual routing: **ASSIGN → T1–T7** after selecting a sample. Auto-assignment applies only when the active track is empty.
-- Chord changes use a **short crossfade**. Exact interaction with One-shot playback remains a documented PR03 approval item; do not silently truncate ordinary One-shot triggers.
+- Chord changes use a **short crossfade** under approved Smart Chord Priority (Option A): new CHORD performance replaces the old chord group even in One-shot. Ordinary NOTE/DRUM One-shot triggers play to natural end except voice stealing or global stop.
 - Maximum eight concurrent voices per track; on overflow the **oldest voice is replaced** with click-safe release.
 - 7TH, 9TH and STRUM can stack; SUS4 replaces the third. Chord spelling and modifier interactions require musical QA.
 - Live chord recording stores **actual note pitches**; future changes to KEY/SCALE do not retroactively transpose recorded notes.
 - STRUM uses a **Slow–Fast slider**, approximately **20–150 ms between notes**, ascending Low → High; Mono Up 1/8 arp takes precedence over STRUM.
 - These are future requirements, not features delivered by the baseline prototype.
+
+### PR04 Smart Chord Priority — approved
+- A CHORD pad starts a managed performance group. A new chord takes priority over the previous group on that track with a short click-safe crossfade, **even when One-shot is selected**. Old pending STRUM and Mono arp attacks are cancelled.
+- Independent NOTE/DRUM One-shot triggers are not chord groups and continue to sample end after finger release, subject to the eight-voice limit and explicit stop.
+- Gate stops its held performance on pad release with a short click-safe release; no sample looping is implied.
+- Maximum eight sounding voices per track, including crossfade tails; replace oldest on overflow. Mono allows only one sounding voice, including transitions.
+- Existing live REC events store absolute triggered MIDI pitches, unaffected by subsequent KEY/SCALE changes. PR05 owns sequencer playback migration.
+- PR04 uses real assigned user samples for ChordMatiK only. Do not imply that SEQ-16 is sample-based until PR05. Stretch DSP and sample editing remain separate future work.
+- Contract: `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
 
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
