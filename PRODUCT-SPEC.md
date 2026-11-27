@@ -26,6 +26,11 @@ Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new 
 ## Performance
 Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, voicing and modifier semantics require review; Mono/Poly capability is approved, but voice limits and interactions remain open.
 
+### ChordMatiK interaction — approved in part
+- **Modifiers:** Short tap toggles/latches a modifier; long press activates it temporarily for the duration of the hold. The exact threshold and interaction conflicts require further design.
+- **Mono chord behavior:** Chord notes are arpeggiated sequentially on Mono tracks. The arp pattern, rate, note-off and retrigger behavior are not yet defined.
+- **Seven-pad mapping:** Not yet approved. Evaluate HiChord's diatonic chord approach before finalizing MiniMatik's mapping. Do not treat the current prototype layout as a final decision.
+
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
 
