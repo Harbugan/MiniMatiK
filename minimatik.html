@@ -377,34 +377,125 @@
         <!-- =================================================================
              MODE 01: SAMPLER (19-SLOT SOUNDBANK, STARTS AT 00/19)
              ================================================================= -->
-        <div id="deck-SAMPLER" class="deck-panel flex-1 flex flex-col justify-between min-h-0">
+        <div id="deck-SAMPLER" class="deck-panel relative flex-1 flex flex-col justify-between min-h-0">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-            <div class="font-mono-tech text-xs">
-              <span class="text-zinc-400">SLOT</span>
-              <span id="samplerSlotId" class="text-amber-300 font-extrabold">01</span>:
-              <span id="samplerSlotState" class="text-zinc-400">EMPTY (0/19)</span>
+            <div class="font-mono-tech text-xs min-w-0 flex items-center gap-1.5 truncate">
+              <span class="text-zinc-400 shrink-0">SLOT</span>
+              <span id="samplerSlotId" class="text-amber-300 font-extrabold shrink-0">01</span><span class="text-zinc-500 shrink-0">:</span>
+              <span id="samplerSlotState" class="text-zinc-400 truncate">EMPTY (00/19)</span>
             </div>
-            <div class="flex items-center gap-1.5">
-              <button id="btnLoadSample" class="hw-btn bg-[#d93829] hover:bg-[#e84738] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
-                ● LOAD / REC SLOT
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btnAcquireSlot" type="button" class="hw-btn bg-[#d93829] hover:bg-[#e84738] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
+                + REC / IMPORT
               </button>
-              <button id="btnLoadDemoKit" class="hw-btn bg-[#2f80ed] hover:bg-[#3d8ef8] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
-                + DEMO KIT (7)
+              <button id="btnPreviewSample" type="button" disabled class="hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-not-allowed">
+                ▶ PREVIEW
               </button>
-              <button id="btnClearSlot" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 text-[11px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-pointer">
+              <button id="btnAssignSlot" type="button" disabled class="hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-not-allowed">
+                ASSIGN
+              </button>
+              <button id="btnClearSlot" type="button" disabled class="hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-not-allowed">
                 CLR
               </button>
             </div>
           </div>
+
+          <input id="sampleFileInput" type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff,.webm" class="hidden" />
 
           <!-- 19 Soundbank Slots Grid -->
           <div id="soundbankGrid" class="grid grid-cols-5 sm:grid-cols-7 gap-2 my-auto">
             <!-- Populated by JS: Slots 01 to 19 -->
           </div>
 
-          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
-            <span>TAP SLOT TO LOAD/PREVIEW & ASSIGN TO ACTIVE TRACK</span>
-            <span id="ramUsageText" class="text-emerald-400 font-bold">SOUNDBANK: 00/19</span>
+          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between gap-2 text-[10px] font-mono-tech text-zinc-400">
+            <span id="samplerFeedbackText" class="truncate">TAP EMPTY SLOT TO RECORD OR IMPORT · SELECT LOADED TO PREVIEW OR ASSIGN</span>
+            <span id="ramUsageText" class="text-emerald-400 font-bold shrink-0">SOUNDBANK: 00/19</span>
+          </div>
+
+          <!-- Compact In-Deck Overlay for Record/Import, Recording State, Assign T1-T7, and Clear Confirmation -->
+          <div id="samplerOverlay" class="hidden absolute inset-0 z-30 bg-black/80 rounded-xl flex items-center justify-center p-3" role="dialog" aria-modal="true" aria-labelledby="samplerOverlayTitle">
+            <div class="w-full max-w-md bg-[#1a1c20] border-2 border-zinc-600 rounded-2xl p-3.5 shadow-2xl font-mono-tech text-[#f5f2e9]">
+              <div class="flex items-center justify-between gap-2 pb-2 mb-2.5 border-b border-zinc-700">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span id="samplerOverlayLed" class="w-2.5 h-2.5 rounded-full bg-amber-300 shrink-0"></span>
+                  <span id="samplerOverlayTitle" class="text-xs font-extrabold tracking-wider text-white truncate">SLOT 01 // EMPTY</span>
+                </div>
+                <button id="samplerOverlayCloseBtn" type="button" aria-label="Close" class="hw-btn bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded text-xs font-bold cursor-pointer border border-zinc-600">
+                  ✕
+                </button>
+              </div>
+
+              <!-- View 1: Compact Record / Import Choice -->
+              <div id="overlayViewAcquire" class="hidden flex-col gap-2.5">
+                <div id="acquireSubtitle" class="text-[11px] text-zinc-300">Choose how to populate this empty slot:</div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button id="btnOverlayRecord" type="button" class="hw-btn bg-[#d93829] hover:bg-[#e84738] text-white py-3 px-3 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer border border-red-400/30">
+                    <span class="text-sm font-extrabold tracking-wider">● RECORD</span>
+                    <span class="text-[9px] text-red-100">TAP TO START MIC</span>
+                  </button>
+                  <button id="btnOverlayImport" type="button" class="hw-btn bg-[#2f80ed] hover:bg-[#3d8ef8] text-white py-3 px-3 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer border border-blue-300/30">
+                    <span class="text-sm font-extrabold tracking-wider">↑ IMPORT</span>
+                    <span class="text-[9px] text-blue-100">LOCAL AUDIO FILE</span>
+                  </button>
+                </div>
+                <div id="acquireRoutingHint" class="text-[10px] text-zinc-400 pt-1 border-t border-zinc-800"></div>
+              </div>
+
+              <!-- View 2: Active Microphone Recording / Requesting / Processing -->
+              <div id="overlayViewRecord" class="hidden flex-col gap-3">
+                <div class="bg-black/60 border border-zinc-700 rounded-xl p-3 flex items-center justify-between">
+                  <div>
+                    <div id="recordStatusText" class="text-xs font-extrabold text-red-400 tracking-wider">● RECORDING</div>
+                    <div id="recordStatusSub" class="text-[10px] text-zinc-400 mt-0.5">Tap Stop to finish capture</div>
+                  </div>
+                  <div id="recordTimerDisplay" class="text-xl font-extrabold text-amber-300 tabular-nums">00:00.0</div>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button id="btnRecordStop" type="button" class="hw-btn bg-[#27ae60] hover:bg-[#2ecc71] text-white py-2.5 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-pointer">
+                    ■ STOP
+                  </button>
+                  <button id="btnRecordCancel" type="button" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 py-2.5 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-pointer">
+                    CANCEL
+                  </button>
+                </div>
+              </div>
+
+              <!-- View 3: Manual Assignment (ASSIGN -> T1..T7) -->
+              <div id="overlayViewAssign" class="hidden flex-col gap-2.5">
+                <div id="assignSubtitle" class="text-[11px] text-zinc-300">Select destination track (T1–T7):</div>
+                <div id="assignTrackGrid" class="grid grid-cols-7 gap-1.5">
+                  <!-- Populated by JS: T1..T7 -->
+                </div>
+                <div class="flex items-center justify-between pt-1.5 border-t border-zinc-800 gap-2">
+                  <span class="text-[9px] text-zinc-400">Tapping an assigned track replaces its sample.</span>
+                  <button id="btnAssignCancel" type="button" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer shrink-0">
+                    CANCEL
+                  </button>
+                </div>
+              </div>
+
+              <!-- View 4: Destructive Clear Confirmation -->
+              <div id="overlayViewClear" class="hidden flex-col gap-3">
+                <div class="bg-black/50 border border-zinc-700 rounded-xl p-2.5 text-[11px] leading-relaxed">
+                  <div id="clearConfirmSample" class="text-amber-300 font-bold"></div>
+                  <div id="clearConfirmTracks" class="text-zinc-300 mt-1"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button id="btnClearConfirm" type="button" class="hw-btn bg-[#d93829] hover:bg-[#e84738] text-white py-2 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-pointer">
+                    CLEAR SLOT
+                  </button>
+                  <button id="btnClearCancel" type="button" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 py-2 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-pointer">
+                    CANCEL
+                  </button>
+                </div>
+              </div>
+
+              <!-- View 5: Decoding Busy Indicator -->
+              <div id="overlayViewDecoding" class="hidden flex-col items-center justify-center py-4 gap-2">
+                <div id="decodingStatusText" class="text-xs font-extrabold text-cyan-300 tracking-wider">DECODING AUDIO...</div>
+                <div class="text-[10px] text-zinc-400">Validating and storing decoded buffer in bank</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -505,7 +596,7 @@
           </div>
 
           <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
-            <span>CHORDMATIK 7-PAD // KEYS 1–7 OR TOUCH</span>
+            <span>CHORDMATIK 7-PAD // <span class="text-zinc-500">LEGACY SYNTH (PR03)</span></span>
             <span id="cmVoicingReadout" class="text-amber-300 font-bold">VOICING: C MAJOR</span>
           </div>
         </div>
@@ -539,7 +630,7 @@
 
           <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
             <span>EDITING: <strong id="seqContextLabel" class="text-white">SCN 01 // TRK 1</strong></span>
-            <span>TAP STEP TO PLOT OR USE <strong class="text-red-400">LIVE REC</strong></span>
+            <span><span class="text-zinc-500">LEGACY SYNTH (PR04)</span> · TAP STEP OR <strong class="text-red-400">LIVE REC</strong></span>
           </div>
         </div>
 
@@ -671,19 +762,20 @@
     </footer>
   </div>
 
+  <script src="js/soundbank-state.js"></script>
+  <script src="js/sample-decoder.js"></script>
+  <script src="js/sample-recorder.js"></script>
+  <script src="js/sample-preview.js"></script>
   <script>
     /**
      * MiniMatik ミニマティック — CREATED BY H∆RBUGΛП
      * Interactive iPad 11" Hardware-Style Groovebox & PS1 Low-Poly Workstation
+     *
+     * PR02 Real Soundbank Foundation:
+     * - Real file import, microphone capture, Web Audio buffer preview, hybrid & manual assignment, clear confirmation.
+     * - ChordMatiK and SEQ-16 retain legacy oscillator prototype audio until PR03/PR04.
      */
     const DECK_MODES = ['SAMPLER', 'CHORDMATIK', 'SEQ', 'MUTATE'];
-
-    const SAMPLE_NAMES = [
-      'KICK_909', 'SNARE_JP', 'PS1_CHIME', 'FM_BASS', 'HIHAT_CL',
-      'BRK_JUNGLE', 'VOX_HIT', 'ORCH_STAB', 'SUB_808', 'ZAP_FX',
-      'KOTO_PLK', 'TAPE_HISS', 'ACID_303', 'GTE_BELL', 'CLAP_94',
-      'RIM_SHOT', 'POLY_PAD', 'GLITCH_X', 'CRASH_19'
-    ];
 
     const ROOT_NOTES = [
       { name: 'C', semi: 0 },
@@ -718,20 +810,24 @@
       currentScene: 0, // 0..63 (SCN 01..64)
       selectedSlot: 0, // 0..18 (Slot 01..19)
 
-      // 19 Soundbank slots — starts completely empty at 00/19
-      soundbank: Array.from({ length: 19 }, (_, i) => ({
-        id: i + 1,
-        loaded: false,
-        name: null,
-        color: ['#d93829', '#2f80ed', '#27ae60', '#f2994a', '#9b51e0'][i % 5]
-      })),
+      // 19 Soundbank slots — starts genuinely empty at 00/19 (no factory samples)
+      soundbank: MiniMatikSoundbank.createEmptySoundbank(),
 
-      // 7 Tracks
-      tracks: Array.from({ length: 7 }, (_, i) => ({
-        id: i + 1,
-        muted: false,
-        assignedSlot: null // 0..18 or null
-      })),
+      // 7 Tracks — all unassigned on fresh load
+      tracks: MiniMatikSoundbank.createInitialTracks(),
+
+      // Sampler PR02 UI & capture state
+      samplerUI: {
+        overlayMode: null, // null | 'acquire' | 'record' | 'assign' | 'clear' | 'decoding'
+        targetSlot: 0,
+        isDecoding: false,
+        pendingImportSlot: null,
+        previewSlot: null,
+        recordStatus: 'idle', // 'idle' | 'requesting' | 'recording' | 'stopping'
+        recordElapsedMs: 0,
+        feedbackText: 'TAP EMPTY SLOT TO RECORD OR IMPORT · SELECT LOADED TO PREVIEW OR ASSIGN',
+        feedbackTone: 'neutral' // 'neutral' | 'success' | 'warn' | 'error'
+      },
 
       // 64 Scenes x 7 Tracks x 16 Steps (each step stores trigger + chordVoicing + recorded X/Y automation)
       scenes: Array.from({ length: 64 }, () =>
@@ -770,22 +866,60 @@
     };
 
     /* =========================================================================
-       WEB AUDIO API RETRO SYNTH & MUTATE DSP ENGINE
+       SHARED WEB AUDIO CONTEXT + PR02 SAMPLE PREVIEW & RECORDER BOUNDARIES
        ========================================================================= */
-    let audioCtx = null;
+    const audioCtxManager = MiniMatikDecoder.createAudioContextManager();
+
+    const samplePreview = MiniMatikPreview.createSamplePreviewPlayer(audioCtxManager, {
+      onStateChange: ({ playing, slotIndex }) => {
+        state.samplerUI.previewSlot = playing ? slotIndex : null;
+        renderSoundbankGrid();
+        updateAllHUD();
+      }
+    });
+
+    const sampleRecorder = MiniMatikRecorder.createRecorderController({
+      onStateChange: (recStatus) => {
+        state.samplerUI.recordStatus = recStatus;
+        updateRecordingOverlayState();
+        updateAllHUD();
+      },
+      onTick: (elapsedMs) => {
+        state.samplerUI.recordElapsedMs = elapsedMs;
+        const timerEl = document.getElementById('recordTimerDisplay');
+        if (timerEl) {
+          timerEl.textContent = formatRecordTimer(elapsedMs);
+        }
+      }
+    });
+
+    function formatRecordTimer(ms) {
+      const clamped = Math.max(0, ms);
+      const totalSec = clamped / 1000;
+      const mins = Math.floor(totalSec / 60);
+      const secs = Math.floor(totalSec % 60);
+      const tenths = Math.floor((clamped % 1000) / 100);
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
+    }
 
     function ensureAudioCtx() {
       if (!state.audioEnabled) return null;
-      if (!audioCtx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (AC) audioCtx = new AC();
+      if (!audioCtxManager.isWebAudioSupported()) return null;
+      try {
+        const ctx = audioCtxManager.getContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        return ctx;
+      } catch (_) {
+        return null;
       }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      return audioCtx;
     }
 
+    /* =========================================================================
+       UI TACTILE CLICK & LEGACY PROTOTYPE SYNTH (CHORDMATIK / SEQ UNTIL PR03/PR04)
+       Never used for soundbank slot loading or sample preview.
+       ========================================================================= */
     function playClick(freq = 920, dur = 0.025) {
       const ctx = ensureAudioCtx();
       if (!ctx) return;
@@ -801,6 +935,8 @@
       osc.stop(ctx.currentTime + dur);
     }
 
+    // LEGACY PROTOTYPE BEHAVIOR (PR03/PR04): Temporary oscillator synth used only by
+    // ChordMatiK and SEQ-16 prototype triggers. Not routed from soundbank samples.
     function playMutatedVoice(midiNotes, duration = 0.36, waveOverride = null) {
       const ctx = ensureAudioCtx();
       if (!ctx) return;
@@ -854,7 +990,7 @@
        GLOBAL HUD & STATE SYNCHRONIZATION
        ========================================================================= */
     function getLoadedCount() {
-      return state.soundbank.filter(s => s.loaded).length;
+      return MiniMatikSoundbank.getLoadedCount(state.soundbank);
     }
 
     function hasTrackAutomation(sceneIdx, trackIdx) {
@@ -863,6 +999,23 @@
 
     function countTrackAutoSteps(sceneIdx, trackIdx) {
       return state.scenes[sceneIdx][trackIdx].filter(st => st.autoX !== null || st.autoY !== null).length;
+    }
+
+    function setSamplerFeedback(message, tone = 'neutral') {
+      state.samplerUI.feedbackText = message;
+      state.samplerUI.feedbackTone = tone;
+      const el = document.getElementById('samplerFeedbackText');
+      if (!el) return;
+      el.textContent = message;
+      el.title = message;
+
+      const toneClasses = {
+        neutral: 'truncate text-zinc-400',
+        success: 'truncate text-emerald-400 font-bold',
+        warn: 'truncate text-amber-300 font-bold',
+        error: 'truncate text-red-400 font-bold'
+      };
+      el.className = toneClasses[tone] || toneClasses.neutral;
     }
 
     function updateAllHUD() {
@@ -892,7 +1045,7 @@
       document.getElementById('deckJpTag').textContent = jpTitles[modeName];
 
       if (modeName === 'SAMPLER') {
-        document.getElementById('deckSubTag').textContent = `${loadedStr}/19 SLOTS`;
+        document.getElementById('deckSubTag').textContent = loaded === 0 ? '00/19 EMPTY' : `${loadedStr}/19 SLOTS`;
       } else if (modeName === 'CHORDMATIK') {
         document.getElementById('deckSubTag').textContent = `${state.chordmatik.subMode} // KEY ${ROOT_NOTES[state.chordmatik.rootIndex].name}`;
       } else if (modeName === 'SEQ') {
@@ -908,7 +1061,7 @@
 
       const assignedSlotObj = trk.assignedSlot !== null ? state.soundbank[trk.assignedSlot] : null;
       const slotTag = assignedSlotObj && assignedSlotObj.loaded
-        ? `S${String(assignedSlotObj.id).padStart(2, '0')} ${assignedSlotObj.name}`
+        ? `S${MiniMatikSoundbank.formatSlotNumber(trk.assignedSlot)} ${assignedSlotObj.name}`
         : 'EMPTY';
 
       document.getElementById('hudTrackLabel').textContent = `TRK ${trk.id} [${trk.muted ? 'MUTE' : slotTag}]`;
@@ -953,9 +1106,18 @@
         joyAutoBadge.className = 'inline-block mt-1 px-1.5 py-0.5 rounded bg-zinc-800 text-[8px] font-bold text-zinc-400';
       }
 
-      // Transport badge on PS1 screen
+      // Transport / Mic Capture / Sample Preview badge on PS1 screen
       const stateBadge = document.getElementById('hudStateBadge');
-      if (state.isRecording) {
+      if (state.samplerUI.recordStatus === 'recording') {
+        stateBadge.textContent = `● MIC REC // S${MiniMatikSoundbank.formatSlotNumber(state.samplerUI.targetSlot)}`;
+        stateBadge.className = 'bg-red-600 text-white px-2 py-0.5 rounded font-bold tracking-wide animate-pulse';
+      } else if (state.samplerUI.recordStatus === 'requesting') {
+        stateBadge.textContent = 'MIC PERMISSION...';
+        stateBadge.className = 'bg-amber-500 text-black px-2 py-0.5 rounded font-bold tracking-wide';
+      } else if (state.samplerUI.previewSlot !== null) {
+        stateBadge.textContent = `▶ PREVIEW // S${MiniMatikSoundbank.formatSlotNumber(state.samplerUI.previewSlot)}`;
+        stateBadge.className = 'bg-[#2f80ed] text-white px-2 py-0.5 rounded font-bold tracking-wide';
+      } else if (state.isRecording) {
         stateBadge.textContent = `● LIVE REC // STEP ${String(state.currentStep + 1).padStart(2, '0')}`;
         stateBadge.className = 'bg-red-600 text-white px-2 py-0.5 rounded font-bold tracking-wide animate-pulse';
       } else if (state.isPlaying) {
@@ -970,6 +1132,11 @@
     function switchDeckMode(idx) {
       state.modeIndex = (idx + DECK_MODES.length) % DECK_MODES.length;
       const modeName = DECK_MODES[state.modeIndex];
+
+      // Close non-recording overlays cleanly when navigating away from SAMPLER
+      if (modeName !== 'SAMPLER' && state.samplerUI.overlayMode && !sampleRecorder.isBusy() && !state.samplerUI.isDecoding) {
+        closeSamplerOverlay();
+      }
 
       // 4-position rotary pointer angles
       const angles = [-54, -18, 18, 54];
@@ -1003,9 +1170,11 @@
       state.tracks.forEach((trk, idx) => {
         const isSel = idx === state.activeTrack;
         const slotObj = trk.assignedSlot !== null ? state.soundbank[trk.assignedSlot] : null;
-        const slotCode = slotObj && slotObj.loaded ? `S${String(slotObj.id).padStart(2, '0')}` : '--';
+        const slotCode = slotObj && slotObj.loaded ? `S${MiniMatikSoundbank.formatSlotNumber(trk.assignedSlot)}` : '--';
 
         const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.trackIndex = String(idx);
         btn.className = `hw-btn py-1 px-0.5 rounded-lg font-mono-tech flex flex-col items-center justify-center cursor-pointer border ${
           isSel
             ? 'bg-[#222428] text-white border-black ring-2 ring-[#d93829]'
@@ -1034,6 +1203,9 @@
           }
           renderTrackBar();
           renderSequencerGrid();
+          if (state.samplerUI.overlayMode === 'acquire') {
+            updateAcquireRoutingHint();
+          }
           updateAllHUD();
         });
 
@@ -1042,70 +1214,529 @@
     }
 
     /* =========================================================================
-       MODE 01: SAMPLER (19 SLOTS, STARTS AT 00/19)
+       MODE 01: SAMPLER (REAL 19-SLOT SOUNDBANK, STARTS AT 00/19)
        ========================================================================= */
+    function updateSamplerActionButtons() {
+      const sel = state.soundbank[state.selectedSlot];
+      const isLoaded = Boolean(sel && sel.loaded && sel.buffer);
+      const isPreviewingSel = state.samplerUI.previewSlot === state.selectedSlot;
+      const busy = sampleRecorder.isBusy() || state.samplerUI.isDecoding;
+
+      const btnAcquire = document.getElementById('btnAcquireSlot');
+      const btnPreview = document.getElementById('btnPreviewSample');
+      const btnAssign = document.getElementById('btnAssignSlot');
+      const btnClear = document.getElementById('btnClearSlot');
+
+      if (isLoaded) {
+        btnAcquire.classList.add('hidden');
+      } else {
+        btnAcquire.classList.remove('hidden');
+        btnAcquire.disabled = busy;
+      }
+
+      btnPreview.disabled = !isLoaded || busy;
+      if (isLoaded && !busy) {
+        if (isPreviewingSel) {
+          btnPreview.textContent = '■ STOP';
+          btnPreview.className = 'hw-btn bg-amber-400 hover:bg-amber-300 text-black text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer';
+        } else {
+          btnPreview.textContent = '▶ PREVIEW';
+          btnPreview.className = 'hw-btn bg-[#27ae60] hover:bg-[#2ecc71] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer';
+        }
+      } else {
+        btnPreview.textContent = '▶ PREVIEW';
+        btnPreview.className = 'hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-not-allowed';
+      }
+
+      btnAssign.disabled = !isLoaded || busy;
+      btnAssign.className = (isLoaded && !busy)
+        ? 'hw-btn bg-[#2f80ed] hover:bg-[#3d8ef8] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer'
+        : 'hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-not-allowed';
+
+      btnClear.disabled = !isLoaded || busy;
+      btnClear.className = (isLoaded && !busy)
+        ? 'hw-btn bg-zinc-700 hover:bg-[#d93829] text-zinc-100 text-[11px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-pointer'
+        : 'hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 text-[11px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-not-allowed';
+    }
+
     function renderSoundbankGrid() {
       const grid = document.getElementById('soundbankGrid');
       grid.innerHTML = '';
 
+      const loadedCount = getLoadedCount();
       const sel = state.soundbank[state.selectedSlot];
-      document.getElementById('samplerSlotId').textContent = String(sel.id).padStart(2, '0');
-      document.getElementById('samplerSlotState').textContent = sel.loaded
-        ? `${sel.name} [LOADED]`
-        : `EMPTY (${String(getLoadedCount()).padStart(2, '0')}/19)`;
-      document.getElementById('samplerSlotState').className = sel.loaded
-        ? 'text-emerald-400 font-bold'
-        : 'text-zinc-400';
+      document.getElementById('samplerSlotId').textContent = MiniMatikSoundbank.formatSlotNumber(state.selectedSlot);
+
+      const slotStateEl = document.getElementById('samplerSlotState');
+      if (sel.loaded && sel.buffer) {
+        const durStr = MiniMatikSoundbank.formatDuration(sel.duration);
+        const srcTag = sel.sourceType === 'record' ? 'MIC' : 'FILE';
+        const assignedTracks = MiniMatikSoundbank.getTracksForSlot(state.tracks, state.selectedSlot);
+        const trkSuffix = assignedTracks.length > 0
+          ? ` → ${assignedTracks.map(t => `T${t + 1}`).join(',')}`
+          : '';
+        slotStateEl.textContent = `${sel.name} (${durStr} · ${srcTag}${trkSuffix})`;
+        slotStateEl.className = 'text-emerald-400 font-bold truncate';
+      } else {
+        slotStateEl.textContent = `EMPTY (${String(loadedCount).padStart(2, '0')}/19)`;
+        slotStateEl.className = 'text-zinc-400 truncate';
+      }
 
       document.getElementById('ramUsageText').textContent =
-        `SOUNDBANK: ${String(getLoadedCount()).padStart(2, '0')}/19`;
+        `SOUNDBANK: ${String(loadedCount).padStart(2, '0')}/19`;
+
+      updateSamplerActionButtons();
 
       state.soundbank.forEach((slot, idx) => {
         const isSel = idx === state.selectedSlot;
+        const isPreviewing = state.samplerUI.previewSlot === idx;
+        const assignedTracks = MiniMatikSoundbank.getTracksForSlot(state.tracks, idx);
+        const slotNum = MiniMatikSoundbank.formatSlotNumber(idx);
+
         const pad = document.createElement('button');
+        pad.type = 'button';
+        pad.dataset.slotIndex = String(idx);
+        pad.dataset.slotLoaded = slot.loaded ? 'true' : 'false';
+        pad.setAttribute('aria-label', slot.loaded
+          ? `Slot ${slotNum}: ${slot.name}`
+          : `Slot ${slotNum}: Empty`);
+
         pad.className = `hw-btn p-1.5 rounded-xl font-mono-tech text-left flex flex-col justify-between h-12 sm:h-13 cursor-pointer border ${
-          isSel
-            ? 'ring-2 ring-amber-300 border-white ' + (slot.loaded ? 'bg-zinc-700' : 'bg-zinc-800')
-            : (slot.loaded ? 'bg-zinc-800 border-zinc-600 hover:bg-zinc-700' : 'bg-[#16181c] border-zinc-800 hover:border-zinc-600')
+          isPreviewing
+            ? 'ring-2 ring-emerald-400 border-emerald-300 bg-zinc-700'
+            : (isSel
+              ? 'ring-2 ring-amber-300 border-white ' + (slot.loaded ? 'bg-zinc-700' : 'bg-zinc-800')
+              : (slot.loaded ? 'bg-zinc-800 border-zinc-600 hover:bg-zinc-700' : 'bg-[#16181c] border-zinc-800 hover:border-zinc-600'))
         }`;
 
-        const dot = slot.loaded
-          ? `<span class="w-2 h-2 rounded-full" style="background:${slot.color}; box-shadow:0 0 6px ${slot.color}"></span>`
-          : `<span class="w-2 h-2 rounded-full border border-zinc-600"></span>`;
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between w-full gap-1';
 
-        pad.innerHTML = `
-          <div class="flex items-center justify-between w-full">
-            <span class="text-[10px] font-extrabold ${slot.loaded ? 'text-white' : 'text-zinc-500'}">${String(slot.id).padStart(2, '0')}</span>
-            ${dot}
-          </div>
-          <div class="text-[8px] truncate w-full ${slot.loaded ? 'text-amber-300 font-bold' : 'text-zinc-600'}">
-            ${slot.loaded ? slot.name : 'EMPTY'}
-          </div>
-        `;
+        const numSpan = document.createElement('span');
+        numSpan.className = `text-[10px] font-extrabold ${slot.loaded ? 'text-white' : 'text-zinc-500'}`;
+        numSpan.textContent = slotNum;
+        topRow.appendChild(numSpan);
+
+        const rightMeta = document.createElement('div');
+        rightMeta.className = 'flex items-center gap-1';
+
+        if (slot.loaded && assignedTracks.length > 0) {
+          const badge = document.createElement('span');
+          badge.className = 'text-[7px] font-extrabold px-1 rounded bg-black/60 text-amber-300 leading-tight';
+          badge.textContent = assignedTracks.length === 1
+            ? `T${assignedTracks[0] + 1}`
+            : `T${assignedTracks[0] + 1}+`;
+          rightMeta.appendChild(badge);
+        }
+
+        const dot = document.createElement('span');
+        if (isPreviewing) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse';
+        } else if (slot.loaded) {
+          dot.className = 'w-2 h-2 rounded-full';
+          dot.style.background = slot.color;
+          dot.style.boxShadow = `0 0 6px ${slot.color}`;
+        } else {
+          dot.className = 'w-2 h-2 rounded-full border border-zinc-600';
+        }
+        rightMeta.appendChild(dot);
+        topRow.appendChild(rightMeta);
+
+        const nameRow = document.createElement('div');
+        nameRow.className = `text-[8px] truncate w-full ${slot.loaded ? 'text-amber-300 font-bold' : 'text-zinc-600'}`;
+        nameRow.textContent = slot.loaded ? slot.name : 'EMPTY';
+
+        pad.appendChild(topRow);
+        pad.appendChild(nameRow);
 
         pad.addEventListener('click', () => {
+          if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+
           state.selectedSlot = idx;
           if (!slot.loaded) {
-            // Clicking an empty slot loads a sample immediately & assigns to active track
-            slot.loaded = true;
-            slot.name = SAMPLE_NAMES[idx];
-          }
-          state.tracks[state.activeTrack].assignedSlot = idx;
-          playMutatedVoice([48 + idx], 0.24, idx % 2 === 0 ? 'square' : 'triangle');
-
-          if (state.isRecording) {
-            state.scenes[state.currentScene][state.activeTrack][state.currentStep].active = true;
-            state.scenes[state.currentScene][state.activeTrack][state.currentStep].midiNotes = [48 + idx];
-            renderSequencerGrid();
+            renderSoundbankGrid();
+            updateAllHUD();
+            openSamplerOverlay('acquire', idx);
+            return;
           }
 
+          // Selecting a loaded slot does NOT overwrite track routing or play fake oscillator audio.
+          setSamplerFeedback(
+            `Selected S${slotNum} "${slot.name}" (${MiniMatikSoundbank.formatDuration(slot.duration)}) — tap PREVIEW, ASSIGN, or CLR.`,
+            'neutral'
+          );
           renderSoundbankGrid();
-          renderTrackBar();
           updateAllHUD();
         });
 
         grid.appendChild(pad);
       });
+    }
+
+    function updateAcquireRoutingHint() {
+      const hintEl = document.getElementById('acquireRoutingHint');
+      if (!hintEl) return;
+      const activeTrk = state.tracks[state.activeTrack];
+      if (activeTrk.assignedSlot === null) {
+        hintEl.textContent = `Active track T${activeTrk.id} is empty — new sample will auto-assign to T${activeTrk.id}.`;
+      } else {
+        const existingCode = `S${MiniMatikSoundbank.formatSlotNumber(activeTrk.assignedSlot)}`;
+        hintEl.textContent = `Active track T${activeTrk.id} already uses ${existingCode} — routing will be preserved until ASSIGN.`;
+      }
+    }
+
+    function updateRecordingOverlayState() {
+      const status = state.samplerUI.recordStatus;
+      const led = document.getElementById('samplerOverlayLed');
+      const statusText = document.getElementById('recordStatusText');
+      const statusSub = document.getElementById('recordStatusSub');
+      const stopBtn = document.getElementById('btnRecordStop');
+      const cancelBtn = document.getElementById('btnRecordCancel');
+      const closeBtn = document.getElementById('samplerOverlayCloseBtn');
+
+      if (state.samplerUI.overlayMode !== 'record') return;
+
+      if (status === 'requesting') {
+        led.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0';
+        statusText.textContent = 'REQUESTING MICROPHONE...';
+        statusText.className = 'text-xs font-extrabold text-amber-300 tracking-wider';
+        statusSub.textContent = 'Allow microphone access when prompted';
+        stopBtn.disabled = true;
+        stopBtn.className = 'hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 py-2.5 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-not-allowed';
+        cancelBtn.disabled = false;
+        closeBtn.classList.add('hidden');
+      } else if (status === 'recording') {
+        led.className = 'w-2.5 h-2.5 rounded-full bg-red-500 rec-blink shrink-0';
+        statusText.textContent = '● RECORDING LIVE';
+        statusText.className = 'text-xs font-extrabold text-red-400 tracking-wider';
+        statusSub.textContent = 'Tap Stop to finish and decode capture';
+        stopBtn.disabled = false;
+        stopBtn.className = 'hw-btn bg-[#27ae60] hover:bg-[#2ecc71] text-white py-2.5 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-pointer';
+        cancelBtn.disabled = false;
+        closeBtn.classList.add('hidden');
+      } else if (status === 'stopping') {
+        led.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shrink-0';
+        statusText.textContent = 'STOPPING CAPTURE...';
+        statusText.className = 'text-xs font-extrabold text-cyan-300 tracking-wider';
+        statusSub.textContent = 'Releasing microphone and decoding audio';
+        stopBtn.disabled = true;
+        stopBtn.className = 'hw-btn bg-zinc-800 text-zinc-500 border border-zinc-700 py-2.5 px-3 rounded-xl text-xs font-extrabold tracking-wider cursor-not-allowed';
+        cancelBtn.disabled = true;
+        closeBtn.classList.add('hidden');
+      }
+    }
+
+    function openSamplerOverlay(mode, slotIdx) {
+      state.samplerUI.overlayMode = mode;
+      state.samplerUI.targetSlot = slotIdx;
+
+      const overlay = document.getElementById('samplerOverlay');
+      const titleEl = document.getElementById('samplerOverlayTitle');
+      const ledEl = document.getElementById('samplerOverlayLed');
+      const closeBtn = document.getElementById('samplerOverlayCloseBtn');
+
+      const views = ['overlayViewAcquire', 'overlayViewRecord', 'overlayViewAssign', 'overlayViewClear', 'overlayViewDecoding'];
+      views.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      });
+
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      const slot = state.soundbank[slotIdx];
+
+      overlay.classList.remove('hidden');
+
+      if (mode === 'acquire') {
+        titleEl.textContent = `SLOT ${slotNum} // EMPTY`;
+        ledEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-300 shrink-0';
+        closeBtn.classList.remove('hidden');
+        document.getElementById('acquireSubtitle').textContent = `Add a real sample into Slot ${slotNum}:`;
+        updateAcquireRoutingHint();
+        const v = document.getElementById('overlayViewAcquire');
+        v.classList.remove('hidden');
+        v.classList.add('flex');
+      } else if (mode === 'record') {
+        titleEl.textContent = `MIC CAPTURE // SLOT ${slotNum}`;
+        closeBtn.classList.add('hidden');
+        document.getElementById('recordTimerDisplay').textContent = '00:00.0';
+        const v = document.getElementById('overlayViewRecord');
+        v.classList.remove('hidden');
+        v.classList.add('flex');
+        updateRecordingOverlayState();
+      } else if (mode === 'assign') {
+        titleEl.textContent = `ASSIGN S${slotNum} → TRACK`;
+        ledEl.className = 'w-2.5 h-2.5 rounded-full bg-[#2f80ed] shrink-0';
+        closeBtn.classList.remove('hidden');
+        document.getElementById('assignSubtitle').textContent = `Route "${slot.name}" to track T1–T7:`;
+
+        const trackGrid = document.getElementById('assignTrackGrid');
+        trackGrid.innerHTML = '';
+        state.tracks.forEach((trk, trkIdx) => {
+          const isAlreadyHere = trk.assignedSlot === slotIdx;
+          const hasOther = trk.assignedSlot !== null && trk.assignedSlot !== slotIdx;
+          const currentCode = trk.assignedSlot !== null
+            ? `S${MiniMatikSoundbank.formatSlotNumber(trk.assignedSlot)}`
+            : '--';
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.assignTrack = String(trkIdx);
+          btn.className = `hw-btn py-2 px-1 rounded-xl font-mono-tech flex flex-col items-center justify-center cursor-pointer border ${
+            isAlreadyHere
+              ? 'bg-[#27ae60] text-white border-emerald-300'
+              : (hasOther
+                ? 'bg-zinc-800 hover:bg-[#2f80ed] text-white border-amber-400/60'
+                : 'bg-zinc-800 hover:bg-[#2f80ed] text-white border-zinc-600')
+          } ${trkIdx === state.activeTrack ? 'ring-1 ring-amber-300' : ''}`;
+
+          const tLabel = document.createElement('span');
+          tLabel.className = 'text-xs font-extrabold';
+          tLabel.textContent = `T${trk.id}`;
+          const sLabel = document.createElement('span');
+          sLabel.className = `text-[9px] font-bold mt-0.5 ${isAlreadyHere ? 'text-emerald-100' : (hasOther ? 'text-amber-300' : 'text-zinc-400')}`;
+          sLabel.textContent = currentCode;
+
+          btn.appendChild(tLabel);
+          btn.appendChild(sLabel);
+
+          btn.addEventListener('click', () => {
+            const res = MiniMatikSoundbank.assignSlotToTrack(state.soundbank, state.tracks, slotIdx, trkIdx);
+            closeSamplerOverlay();
+            if (res.assigned) {
+              const msg = res.replaced
+                ? `Assigned S${slotNum} "${slot.name}" → T${trk.id} (replaced S${MiniMatikSoundbank.formatSlotNumber(res.previousSlot)}).`
+                : `Assigned S${slotNum} "${slot.name}" → T${trk.id}.`;
+              setSamplerFeedback(msg, 'success');
+              renderSoundbankGrid();
+              renderTrackBar();
+              updateAllHUD();
+            }
+          });
+
+          trackGrid.appendChild(btn);
+        });
+
+        const v = document.getElementById('overlayViewAssign');
+        v.classList.remove('hidden');
+        v.classList.add('flex');
+      } else if (mode === 'clear') {
+        titleEl.textContent = `CLEAR SLOT ${slotNum}?`;
+        ledEl.className = 'w-2.5 h-2.5 rounded-full bg-[#d93829] shrink-0';
+        closeBtn.classList.remove('hidden');
+
+        document.getElementById('clearConfirmSample').textContent =
+          `S${slotNum}: "${slot.name}" (${MiniMatikSoundbank.formatDuration(slot.duration)})`;
+
+        const refTracks = MiniMatikSoundbank.getTracksForSlot(state.tracks, slotIdx);
+        document.getElementById('clearConfirmTracks').textContent = refTracks.length > 0
+          ? `This will remove the sample and unassign: ${refTracks.map(t => `T${t + 1}`).join(', ')}.`
+          : 'This will remove the sample from the soundbank. Other slots remain intact.';
+
+        const v = document.getElementById('overlayViewClear');
+        v.classList.remove('hidden');
+        v.classList.add('flex');
+      } else if (mode === 'decoding') {
+        titleEl.textContent = `SLOT ${slotNum} // PROCESSING`;
+        ledEl.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shrink-0';
+        closeBtn.classList.add('hidden');
+        const v = document.getElementById('overlayViewDecoding');
+        v.classList.remove('hidden');
+        v.classList.add('flex');
+      }
+    }
+
+    function closeSamplerOverlay() {
+      state.samplerUI.overlayMode = null;
+      const overlay = document.getElementById('samplerOverlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    function finishSampleAcquisition(slotIdx, decodedPayload, displayName) {
+      const result = MiniMatikSoundbank.storeSampleInSlot(
+        state.soundbank,
+        state.tracks,
+        state.activeTrack,
+        slotIdx,
+        {
+          ...decodedPayload,
+          name: displayName
+        }
+      );
+
+      state.selectedSlot = slotIdx;
+      state.visualPulse = 0.85;
+      closeSamplerOverlay();
+
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      const durStr = MiniMatikSoundbank.formatDuration(result.slot.duration);
+      const actionVerb = result.slot.sourceType === 'record' ? 'Recorded' : 'Imported';
+
+      let routingNote;
+      if (result.autoAssigned) {
+        routingNote = `auto-assigned to T${result.autoAssignedTrack + 1}.`;
+      } else if (result.preservedSlot !== null) {
+        routingNote = `T${state.activeTrack + 1} kept S${MiniMatikSoundbank.formatSlotNumber(result.preservedSlot)} (tap ASSIGN to route).`;
+      } else {
+        routingNote = 'ready to preview or assign.';
+      }
+
+      setSamplerFeedback(
+        `${actionVerb} "${result.slot.name}" (${durStr}) in S${slotNum} — ${routingNote}`,
+        'success'
+      );
+
+      renderSoundbankGrid();
+      renderTrackBar();
+      updateAllHUD();
+    }
+
+    async function handleSelectedImportFile(file, slotIdx) {
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      if (!file) {
+        closeSamplerOverlay();
+        setSamplerFeedback(`Import cancelled — Slot ${slotNum} unchanged.`, 'warn');
+        renderSoundbankGrid();
+        return;
+      }
+
+      samplePreview.stop();
+      state.samplerUI.isDecoding = true;
+      document.getElementById('decodingStatusText').textContent = `DECODING "${file.name}"...`;
+      openSamplerOverlay('decoding', slotIdx);
+      updateSamplerActionButtons();
+
+      try {
+        const decoded = await MiniMatikDecoder.decodeFile(file, audioCtxManager);
+        state.samplerUI.isDecoding = false;
+        finishSampleAcquisition(slotIdx, decoded, file.name);
+      } catch (err) {
+        state.samplerUI.isDecoding = false;
+        closeSamplerOverlay();
+        setSamplerFeedback(
+          (err && err.message) ? err.message : `Could not decode audio file — Slot ${slotNum} unchanged.`,
+          'error'
+        );
+        renderSoundbankGrid();
+        updateAllHUD();
+      }
+    }
+
+    async function startMicrophoneCapture(slotIdx) {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      samplePreview.stop();
+
+      const support = MiniMatikRecorder.checkRecordingSupport();
+      if (!support.supported) {
+        closeSamplerOverlay();
+        setSamplerFeedback(support.message, 'error');
+        renderSoundbankGrid();
+        updateAllHUD();
+        return;
+      }
+
+      openSamplerOverlay('record', slotIdx);
+      updateSamplerActionButtons();
+
+      try {
+        const startResult = await sampleRecorder.start();
+        if (startResult && startResult.cancelled) {
+          closeSamplerOverlay();
+          setSamplerFeedback(`Recording cancelled — Slot ${slotNum} unchanged.`, 'warn');
+          renderSoundbankGrid();
+          updateAllHUD();
+        }
+      } catch (err) {
+        closeSamplerOverlay();
+        setSamplerFeedback(
+          (err && err.message) ? err.message : `Microphone recording failed — Slot ${slotNum} unchanged.`,
+          'error'
+        );
+        renderSoundbankGrid();
+        updateAllHUD();
+      }
+    }
+
+    async function stopMicrophoneCapture() {
+      const slotIdx = state.samplerUI.targetSlot;
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+
+      try {
+        const capture = await sampleRecorder.stop();
+        if (!capture || capture.cancelled) {
+          closeSamplerOverlay();
+          setSamplerFeedback(`Recording cancelled — Slot ${slotNum} unchanged.`, 'warn');
+          renderSoundbankGrid();
+          updateAllHUD();
+          return;
+        }
+
+        state.samplerUI.isDecoding = true;
+        document.getElementById('decodingStatusText').textContent = 'DECODING RECORDING...';
+        openSamplerOverlay('decoding', slotIdx);
+        updateSamplerActionButtons();
+
+        const decoded = await MiniMatikDecoder.decodeRecordedBlob(capture.blob, audioCtxManager);
+        state.samplerUI.isDecoding = false;
+        finishSampleAcquisition(
+          slotIdx,
+          decoded,
+          MiniMatikSoundbank.buildRecordingName(slotIdx)
+        );
+      } catch (err) {
+        state.samplerUI.isDecoding = false;
+        closeSamplerOverlay();
+        setSamplerFeedback(
+          (err && err.message) ? err.message : `Recording failed — Slot ${slotNum} unchanged.`,
+          'error'
+        );
+        renderSoundbankGrid();
+        updateAllHUD();
+      }
+    }
+
+    function cancelMicrophoneCapture() {
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(state.samplerUI.targetSlot);
+      sampleRecorder.cancel();
+      closeSamplerOverlay();
+      setSamplerFeedback(`Recording cancelled — Slot ${slotNum} unchanged.`, 'warn');
+      renderSoundbankGrid();
+      updateAllHUD();
+    }
+
+    async function toggleSelectedSlotPreview() {
+      const slotIdx = state.selectedSlot;
+      const slot = state.soundbank[slotIdx];
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+
+      if (!slot || !slot.loaded || !slot.buffer) return;
+
+      if (samplePreview.isPlaying() && samplePreview.getPlayingSlotIndex() === slotIdx) {
+        samplePreview.stop();
+        setSamplerFeedback(`Preview stopped (S${slotNum}).`, 'neutral');
+        return;
+      }
+
+      if (!state.audioEnabled) {
+        setSamplerFeedback('Audio is muted — enable AUDIO in the header to preview.', 'warn');
+        return;
+      }
+
+      try {
+        await samplePreview.play(slotIdx, slot.buffer);
+        state.visualPulse = 1.0;
+        setSamplerFeedback(
+          `Previewing S${slotNum} "${slot.name}" (${MiniMatikSoundbank.formatDuration(slot.duration)}).`,
+          'neutral'
+        );
+      } catch (err) {
+        setSamplerFeedback(
+          (err && err.message) ? `Preview failed: ${err.message}` : 'Unable to preview sample.',
+          'error'
+        );
+      }
     }
 
     /* =========================================================================
@@ -1669,7 +2300,11 @@
       document.getElementById('audioLed').className = state.audioEnabled
         ? 'w-2 h-2 rounded-full bg-emerald-400'
         : 'w-2 h-2 rounded-full bg-zinc-600';
-      if (state.audioEnabled) playClick(1150);
+      if (!state.audioEnabled) {
+        samplePreview.stop();
+      } else {
+        playClick(1150);
+      }
     });
 
     // Scene & BPM Controls
@@ -1702,41 +2337,162 @@
       updateAllHUD();
     });
 
-    // Sampler Controls
-    document.getElementById('btnLoadSample').addEventListener('click', () => {
-      const slot = state.soundbank[state.selectedSlot];
-      slot.loaded = true;
-      slot.name = SAMPLE_NAMES[state.selectedSlot];
-      state.tracks[state.activeTrack].assignedSlot = state.selectedSlot;
-      playMutatedVoice([48 + state.selectedSlot], 0.24, 'square');
+    // PR02 Sampler Controls (Real Acquire / Preview / Assign / Confirm Clear)
+    const sampleFileInput = document.getElementById('sampleFileInput');
+    let importCancelFallbackTimer = null;
+
+    function clearImportPending() {
+      state.samplerUI.pendingImportSlot = null;
+      if (importCancelFallbackTimer !== null) {
+        clearTimeout(importCancelFallbackTimer);
+        importCancelFallbackTimer = null;
+      }
+    }
+
+    function handleImportCancelled(slotIdx) {
+      clearImportPending();
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      if (state.samplerUI.overlayMode === 'acquire') {
+        closeSamplerOverlay();
+      }
+      setSamplerFeedback(`Import cancelled — Slot ${slotNum} unchanged.`, 'warn');
       renderSoundbankGrid();
-      renderTrackBar();
       updateAllHUD();
+    }
+
+    document.getElementById('btnAcquireSlot').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+      const slot = state.soundbank[state.selectedSlot];
+      if (!slot.loaded) {
+        openSamplerOverlay('acquire', state.selectedSlot);
+      }
     });
 
-    document.getElementById('btnLoadDemoKit').addEventListener('click', () => {
-      for (let i = 0; i < 7; i++) {
-        state.soundbank[i].loaded = true;
-        state.soundbank[i].name = SAMPLE_NAMES[i];
-        state.tracks[i].assignedSlot = i;
+    document.getElementById('btnPreviewSample').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+      toggleSelectedSlotPreview();
+    });
+
+    document.getElementById('btnAssignSlot').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+      const slot = state.soundbank[state.selectedSlot];
+      if (slot && slot.loaded && slot.buffer) {
+        openSamplerOverlay('assign', state.selectedSlot);
       }
-      playMutatedVoice([48, 55, 60], 0.28);
-      renderSoundbankGrid();
-      renderTrackBar();
-      updateAllHUD();
     });
 
     document.getElementById('btnClearSlot').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
       const slot = state.soundbank[state.selectedSlot];
-      slot.loaded = false;
-      slot.name = null;
-      state.tracks.forEach(t => {
-        if (t.assignedSlot === state.selectedSlot) t.assignedSlot = null;
-      });
-      playClick(360);
+      if (slot && slot.loaded) {
+        openSamplerOverlay('clear', state.selectedSlot);
+      }
+    });
+
+    // Overlay Action Handlers
+    document.getElementById('btnOverlayRecord').addEventListener('click', () => {
+      const targetSlot = state.samplerUI.targetSlot;
+      startMicrophoneCapture(targetSlot);
+    });
+
+    document.getElementById('btnOverlayImport').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+      const targetSlot = state.samplerUI.targetSlot;
+
+      if (!audioCtxManager.isWebAudioSupported()) {
+        closeSamplerOverlay();
+        setSamplerFeedback('Web Audio API is unavailable in this browser — cannot decode audio files.', 'error');
+        return;
+      }
+
+      // Warm up AudioContext synchronously inside user gesture (important on iPad Safari).
+      try {
+        audioCtxManager.getContext();
+      } catch (_) {}
+
+      clearImportPending();
+      state.samplerUI.pendingImportSlot = targetSlot;
+      sampleFileInput.value = '';
+
+      // Focus fallback for browsers that do not emit the HTMLInputElement "cancel" event.
+      const onWindowFocusAfterPicker = () => {
+        window.removeEventListener('focus', onWindowFocusAfterPicker);
+        importCancelFallbackTimer = setTimeout(() => {
+          importCancelFallbackTimer = null;
+          if (
+            state.samplerUI.pendingImportSlot === targetSlot &&
+            (!sampleFileInput.files || sampleFileInput.files.length === 0)
+          ) {
+            handleImportCancelled(targetSlot);
+          }
+        }, 550);
+      };
+      window.addEventListener('focus', onWindowFocusAfterPicker, { once: true });
+
+      sampleFileInput.click();
+    });
+
+    sampleFileInput.addEventListener('change', () => {
+      const slotIdx = state.samplerUI.pendingImportSlot !== null
+        ? state.samplerUI.pendingImportSlot
+        : state.selectedSlot;
+      const file = sampleFileInput.files && sampleFileInput.files[0] ? sampleFileInput.files[0] : null;
+      clearImportPending();
+      sampleFileInput.value = '';
+      handleSelectedImportFile(file, slotIdx);
+    });
+
+    sampleFileInput.addEventListener('cancel', () => {
+      const slotIdx = state.samplerUI.pendingImportSlot !== null
+        ? state.samplerUI.pendingImportSlot
+        : state.selectedSlot;
+      handleImportCancelled(slotIdx);
+    });
+
+    document.getElementById('btnRecordStop').addEventListener('click', () => {
+      stopMicrophoneCapture();
+    });
+
+    document.getElementById('btnRecordCancel').addEventListener('click', () => {
+      cancelMicrophoneCapture();
+    });
+
+    document.getElementById('btnAssignCancel').addEventListener('click', () => {
+      closeSamplerOverlay();
+    });
+
+    document.getElementById('btnClearConfirm').addEventListener('click', () => {
+      const slotIdx = state.samplerUI.targetSlot;
+      const slotNum = MiniMatikSoundbank.formatSlotNumber(slotIdx);
+      if (samplePreview.getPlayingSlotIndex() === slotIdx) {
+        samplePreview.stop();
+      }
+      const res = MiniMatikSoundbank.clearSlot(state.soundbank, state.tracks, slotIdx);
+      closeSamplerOverlay();
+      if (res.cleared) {
+        const trackMsg = res.unassignedTracks.length > 0
+          ? ` (unassigned ${res.unassignedTracks.map(t => `T${t + 1}`).join(', ')})`
+          : '';
+        setSamplerFeedback(`Cleared Slot ${slotNum}${trackMsg}.`, 'neutral');
+      }
       renderSoundbankGrid();
       renderTrackBar();
       updateAllHUD();
+    });
+
+    document.getElementById('btnClearCancel').addEventListener('click', () => {
+      closeSamplerOverlay();
+    });
+
+    document.getElementById('samplerOverlayCloseBtn').addEventListener('click', () => {
+      if (sampleRecorder.isBusy() || state.samplerUI.isDecoding) return;
+      closeSamplerOverlay();
+    });
+
+    document.getElementById('samplerOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'samplerOverlay' && !sampleRecorder.isBusy() && !state.samplerUI.isDecoding) {
+        closeSamplerOverlay();
+      }
     });
 
     // ChordMatiK 7 Pads, Submode & Modifier Pad
@@ -1774,9 +2530,16 @@
       renderChordMatiKUI();
     });
 
-    // Keyboard shortcuts (1..7 for ChordMatiK pads, Space for Play/Stop)
+    // Keyboard shortcuts (Escape closes non-recording overlay; 1..7 & Space guarded while overlay/recording active)
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
+      if (e.key === 'Escape' && state.samplerUI.overlayMode && !sampleRecorder.isBusy() && !state.samplerUI.isDecoding) {
+        closeSamplerOverlay();
+        return;
+      }
+      if (state.samplerUI.overlayMode || sampleRecorder.isBusy() || state.samplerUI.isDecoding) {
+        return;
+      }
       if (e.key >= '1' && e.key <= '7') {
         const deg = Number(e.key) - 1;
         const el = document.querySelector(`[data-degree="${deg}"]`);
@@ -1785,6 +2548,16 @@
         e.preventDefault();
         state.isPlaying ? stopTransport() : startTransport();
       }
+    });
+
+    // Ensure microphone tracks and audio preview are always released on page leave
+    window.addEventListener('pagehide', () => {
+      sampleRecorder.forceCleanup();
+      samplePreview.stop();
+    });
+    window.addEventListener('beforeunload', () => {
+      sampleRecorder.forceCleanup();
+      samplePreview.stop();
     });
 
     // Sequencer Buttons

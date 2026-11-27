@@ -1,7 +1,7 @@
 # Architecture — Baseline and Target
 
 ## Current implementation (observed)
-Single HTML document with inline CSS/JavaScript and Tailwind CDN. In-memory state: 19 slots, seven tracks, 64 scenes x seven tracks x 16 steps. Canvas 2D low-poly animation. Web Audio oscillators synthesize notes. JavaScript setInterval drives sequencer ticks. Joystick stores X/Y values at step resolution.
+Single HTML workspace (`minimatik.html`) with inline CSS/UI wiring, Tailwind CDN, and four dependency-free PR02 soundbank modules loaded via classic `<script>` tags (`js/soundbank-state.js`, `js/sample-decoder.js`, `js/sample-recorder.js`, `js/sample-preview.js`). In-memory state: 19 initially empty soundbank slots holding real decoded `AudioBuffer` assets and metadata, seven tracks with hybrid auto-assignment and explicit `ASSIGN → T1–T7` routing, and 64 scenes x seven tracks x 16 steps. Real Web Audio `AudioBufferSourceNode` playback powers sample preview with click-safe stop. Canvas 2D renders the PS1 low-poly animation. ChordMatiK and SEQ-16 still use legacy Web Audio oscillators (`playMutatedVoice`) and `setInterval` ticks pending PR03/PR04. Joystick stores X/Y values at step resolution.
 
 ## Target architecture (proposal, not approved implementation)
 1. User sample acquisition: file import / microphone capture.
