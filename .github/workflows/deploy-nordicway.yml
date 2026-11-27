@@ -5,7 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'minimatik.html'
+      - 'index.html'
+      - 'styles/**'
+      - 'js/**'
       - '.github/workflows/deploy-nordicway.yml'
   workflow_dispatch:
 
@@ -27,7 +29,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate credentials and entry point
+      - name: Validate credentials and runtime asset manifest
         env:
           FTP_USER: ${{ secrets.NORDICWAY_FTP_USER }}
           FTP_PASSWORD: ${{ secrets.NORDICWAY_FTP_PASSWORD }}
@@ -36,19 +38,51 @@ jobs:
           set -euo pipefail
           test -n "$FTP_USER" || { echo "::error::Missing NORDICWAY_FTP_USER"; exit 1; }
           test -n "$FTP_PASSWORD" || { echo "::error::Missing NORDICWAY_FTP_PASSWORD"; exit 1; }
-          test -f minimatik.html || { echo "::error::Missing minimatik.html"; exit 1; }
+          test -f index.html || { echo "::error::Missing index.html"; exit 1; }
+          test -d styles || { echo "::error::Missing styles directory"; exit 1; }
+          test -d js || { echo "::error::Missing js directory"; exit 1; }
 
-      - name: Upload MiniMatik entry point
+          MANIFEST="$RUNNER_TEMP/deploy-manifest.txt"
+          {
+            echo "index.html"
+            find styles -type f -name '*.css' | sort
+            find js -type f -name '*.js' | sort
+          } > "$MANIFEST"
+
+          CSS_COUNT=$(grep -c '^styles/' "$MANIFEST" || true)
+          JS_COUNT=$(grep -c '^js/' "$MANIFEST" || true)
+          test "$CSS_COUNT" -gt 0 || { echo "::error::No CSS files found under styles/"; exit 1; }
+          test "$JS_COUNT" -gt 0 || { echo "::error::No JS files found under js/"; exit 1; }
+
+          # Verify every local asset referenced by index.html is in the deploy manifest
+          while IFS= read -r ref; do
+            clean="${ref#./}"
+            if ! grep -Fxq "$clean" "$MANIFEST"; then
+              echo "::error::index.html references '$ref' which is missing from deploy manifest"
+              exit 1
+            fi
+          done < <(grep -oE '(href|src)="\./(styles|js)/[^"]+"' index.html | sed -E 's/^(href|src)="([^"]+)"$/\2/')
+
+          echo "Validated runtime deploy manifest ($(wc -l < "$MANIFEST") files):"
+          cat "$MANIFEST"
+
+      - name: Upload MiniMatik runtime files
         env:
           FTP_USER: ${{ secrets.NORDICWAY_FTP_USER }}
           FTP_PASSWORD: ${{ secrets.NORDICWAY_FTP_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
-          echo "Uploading minimatik.html as index.html to MiniMatik directory"
-          curl --fail --show-error --silent --retry 2 \
-            --ssl-reqd --ftp-pasv --ftp-create-dirs \
-            --user "$FTP_USER:$FTP_PASSWORD" \
-            --upload-file minimatik.html \
-            "ftp://cp17.nordicway.dk//public_html/Projects/MiniMatik/index.html"
-          echo "MiniMatik deployment completed (no remote deletions)."
+          MANIFEST="$RUNNER_TEMP/deploy-manifest.txt"
+          REMOTE_BASE="ftp://cp17.nordicway.dk//public_html/Projects/MiniMatik"
+
+          while IFS= read -r file; do
+            echo "Uploading $file -> /public_html/Projects/MiniMatik/$file"
+            curl --fail --show-error --silent --retry 2 \
+              --ssl-reqd --ftp-pasv --ftp-create-dirs \
+              --user "$FTP_USER:$FTP_PASSWORD" \
+              --upload-file "$file" \
+              "$REMOTE_BASE/$file"
+          done < "$MANIFEST"
+
+          echo "MiniMatik multi-file deployment completed (no remote deletions)."

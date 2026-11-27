@@ -1,0 +1,65 @@
+/* MiniMatik — Mode & Monitor View-Specific Styles */
+
+/* PS1 Low-Poly CRT Screen */
+.ps1-monitor-glass {
+  position: relative;
+  background: #070b14;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 28px rgba(0, 0, 0, 0.96),
+    inset 0 0 4px rgba(103, 232, 249, 0.35);
+}
+
+.ps1-monitor-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.36) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+canvas#ps1Canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ChordMatiK Ergonomic 7-Button Keys */
+.chord-key-lower {
+  background: linear-gradient(180deg, #f8f5ed 0%, #ded8c6 100%);
+  color: #181a1d;
+  border: 2px solid #9d9683;
+  box-shadow:
+    0 5px 0 #787160,
+    0 7px 10px rgba(0, 0, 0, 0.55),
+    inset 0 2px 0 #ffffff;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+.chord-key-lower:active, .chord-key-lower.key-fired {
+  transform: translateY(4px);
+  background: linear-gradient(180deg, #ffe2c2 0%, #f5b97a 100%);
+  border-color: #d93829;
+  box-shadow: 0 1px 0 #665f50, inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chord-key-upper {
+  background: linear-gradient(180deg, #3c4047 0%, #26292e 100%);
+  color: #f5f2e9;
+  border: 2px solid #141518;
+  box-shadow:
+    0 5px 0 #0d0e10,
+    0 7px 10px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+.chord-key-upper:active, .chord-key-upper.key-fired {
+  transform: translateY(4px);
+  background: linear-gradient(180deg, #ea493a 0%, #b5271a 100%);
+  box-shadow: 0 1px 0 #0d0e10, inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}

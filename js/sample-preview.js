@@ -4,20 +4,9 @@
  * Plays loaded AudioBuffer samples directly through AudioBufferSourceNode + GainNode.
  * Click-safe fade-in and fade-out on early stop. Never synthesizes fallback oscillator tones.
  */
-(function (root, factory) {
-  const api = factory();
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = api;
-  }
-  if (root) {
-    root.MiniMatikPreview = api;
-  }
-})(typeof window !== 'undefined' ? window : globalThis, function () {
-  'use strict';
-
-  const FADE_IN_SEC = 0.004;
-  const FADE_OUT_SEC = 0.015;
-  const STOP_SAFETY_PAD_SEC = 0.004;
+export const FADE_IN_SEC = 0.004;
+export const FADE_OUT_SEC = 0.015;
+const STOP_SAFETY_PAD_SEC = 0.004;
 
   function createSamplePreviewPlayer(audioContextManager, callbacks) {
     const onStateChange = (callbacks && callbacks.onStateChange) || function () {};
@@ -121,9 +110,6 @@
     };
   }
 
-  return {
-    FADE_IN_SEC,
-    FADE_OUT_SEC,
-    createSamplePreviewPlayer
-  };
-});
+export {
+  createSamplePreviewPlayer
+};

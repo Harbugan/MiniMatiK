@@ -5,26 +5,15 @@
  * decodes user-supplied local audio files and recorded audio blobs into
  * real AudioBuffer instances without synthetic fallbacks.
  */
-(function (root, factory) {
-  const api = factory();
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = api;
-  }
-  if (root) {
-    root.MiniMatikDecoder = api;
-  }
-})(typeof window !== 'undefined' ? window : globalThis, function () {
-  'use strict';
+export const MIN_VALID_DURATION_SEC = 0.02;
 
-  const MIN_VALID_DURATION_SEC = 0.02;
-
-  class SampleDecodeError extends Error {
-    constructor(code, message) {
-      super(message);
-      this.name = 'SampleDecodeError';
-      this.code = code;
-    }
+export class SampleDecodeError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'SampleDecodeError';
+    this.code = code;
   }
+}
 
   function createAudioContextManager() {
     let audioCtx = null;
@@ -237,13 +226,10 @@
     };
   }
 
-  return {
-    SampleDecodeError,
-    MIN_VALID_DURATION_SEC,
-    createAudioContextManager,
-    readBlobAsArrayBuffer,
-    decodeAudioDataCompat,
-    decodeFile,
-    decodeRecordedBlob
-  };
-});
+export {
+  createAudioContextManager,
+  readBlobAsArrayBuffer,
+  decodeAudioDataCompat,
+  decodeFile,
+  decodeRecordedBlob
+};
