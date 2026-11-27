@@ -98,18 +98,18 @@
 - **Manual assignment:** Select a sample, choose **ASSIGN**, then select destination track T1–T7. An existing assignment is never overwritten automatically; an explicit assignment may replace it.
 - **STRUM speed:** Slow–Fast slider, approximately **20–150 ms between notes**. Final default and precise range are tuning parameters.
 
-## Reconciliation — documented, not silently approved
-- **Crossfade vs One-shot:** The two rules can conflict if chord switching stops a One-shot voice before completion. Proposed resolution for later PR03: crossfade applies to active chord-performance voices; ordinary One-shot triggers are allowed to finish. This exception requires product-owner approval before PR03 implementation.
+## Reconciliation — historical notes (superseded where noted)
+- **Crossfade vs One-shot (RESOLVED for PR04):** Approved Smart Chord Priority, Option A, below supersedes the pending proposal. CHORD performances crossfade on replacement even in One-shot; independent NOTE/DRUM One-shots play to natural end subject to voice limits.
 - **Mono arp vs default Poly:** No conflict: Poly is the default; selecting Mono enables the previously approved Up 1/8-note arpeggio.
 - **Eight voices vs STRUM and stacked modifiers:** Enforce eight voices per track using oldest-voice stealing, with click-safe fade. Verify dense chords and retriggers in QA.
 - **Absolute notes vs key changes:** Recorded pitches remain fixed; key/scale changes affect future live chord triggers. Exact sequencer editing semantics remain to be designed.
-- **Scope:** Real-time stretch quality, Gate release envelope, microphone permissions, persistence, and visual mascot remain outside the first implementation contract.
+- **Scope:** Real-time Stretch DSP, non-destructive sample editing, persistence, and visual mascot remain outside PR04; basic click-safe Gate release is included.
 
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK remaining acceptance details: One-shot/crossfade reconciliation, exact voicing and Gate release envelope; core defaults, voice stealing, recorded pitches and STRUM range are approved.
+- ChordMatiK implementation tuning: exact scale-derived seventh/ninth voicing tests, Gate envelope timing, sample root-pitch reference and touch threshold. Smart Chord Priority is approved; these tuning items are not permission to change its behavior.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
@@ -117,3 +117,13 @@
 
 ## Prototype discrepancies (not decisions)
 The supplied HTML fills empty slots with predefined labels and plays oscillators. Its demo-kit button is prototype behavior and must not be mistaken for approval of factory sounds.
+
+## Approved — PR04 Smart Chord Priority (Option A, 2026-11-27)
+- **Scope of switching:** A CHORD pad creates a managed chord-performance group on its track. A newly triggered CHORD supersedes the previous group with a short, click-safe crossfade, **including in One-shot mode**. This is an explicit exception to the ordinary One-shot natural-end rule.
+- **Ordinary One-shot:** Independent NOTE/DRUM sample triggers are not chord groups. Their voices continue until natural sample end after release, unless stolen to enforce the voice budget or stopped globally.
+- **Gate:** Releasing a held pad ends its associated performance with a click-safe release. A sample also stops naturally at its buffer end; looping is not implied.
+- **Pending attacks:** Switching chords cancels any not-yet-started STRUM or Mono arpeggio attacks from the outgoing chord.
+- **Polyphony:** Eight simultaneously sounding voices maximum per track, counting crossfade tails. Steal the oldest sounding voice with a click-safe fade when needed. Mono permits one sounding voice per track; a new note replaces the previous without violating that cap.
+- **Recording:** Keep actual absolute MIDI note pitches in existing live-recorded step events; do not re-harmonize recorded pitches when KEY/SCALE changes.
+- **Scope control:** This resolves the crossfade/One-shot conflict for PR04. PR05 still owns sequencer clock and sample-based step playback. Precise fades, touch threshold, root pitch calibration and extended chord spelling are implementation tuning / QA topics, not additional approved features.
+- **Contract:** `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
