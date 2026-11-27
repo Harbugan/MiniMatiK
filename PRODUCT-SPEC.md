@@ -17,8 +17,14 @@ Each loaded sample supports **Trim**, **Pitch**, **Volume**, and **Reverse**. Ed
 ### Track assignment — approved
 Seven tracks can reference soundbank samples. **Hybrid assignment:** when a new sample is acquired, automatically assign it to the active track **if and only if that track is unassigned**. If the active track already has a sample, preserve that assignment and require an explicit manual assignment action. This rule supersedes the earlier "first sample only" wording. The manual assignment UI remains open.
 
+### Sample playback — approved
+- **One-shot / Gate:** Selectable sample playback modes. One-shot triggers playback of the sample without requiring a sustained press; Gate follows the held input, subject to the sample's available duration. Exact note-off and looping behavior are open.
+- **Tape / Stretch:** Selectable pitch/time behavior. Tape changes playback rate and pitch together; Stretch changes pitch while preserving sample duration. The stretch algorithm and quality/performance requirements are open.
+- **Mono / Poly:** Both voice modes are supported, selectable **per track**. Poly allows overlapping sample voices; Mono constrains playback to one active voice for that track. Voice limits, retrigger and voice-stealing rules remain open.
+- These are intended capabilities, not implemented audio behavior in the baseline HTML.
+
 ## Performance
-Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, sample pitching, polyphony, and modifier semantics require review.
+Seven selectable tracks, with mute. ChordMatiK is a compact seven-pad chord/note/drum performance surface, with root, octave, and modifiers. Exact chord behavior, voicing and modifier semantics require review; Mono/Poly capability is approved, but voice limits and interactions remain open.
 
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
