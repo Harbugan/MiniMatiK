@@ -83,3 +83,6 @@ Context-sensitive PS1-style low-poly display showing active mode, track, scene, 
 
 ## Non-goals for baseline
 No feature expansion, audio architecture rewrite, or redesign until explicitly approved.
+
+### Sample Editing delivery placement — approved 2026-11-28
+Sample Editing is a **dedicated planned work item after PR05 Sequencer**, not part of PR05. Keep all four approved non-destructive operations (TRIM, PITCH, VOLUME, REVERSE) and retain original sample data. Specific waveform UI, touch editing behavior, parameter ranges, and preview integration remain design decisions to be made before implementation. See ROADMAP.md; no editor has been implemented by this documentation update.
