@@ -40,6 +40,18 @@ Four modifier controls: **7TH**, **SUS4**, **9TH**, and **STRUM**, arranged **ab
 - **Mono chord behavior:** Chord notes are arpeggiated sequentially on Mono tracks. The arp pattern, rate, note-off and retrigger behavior are not yet defined.
 - **Seven-pad mapping:** Seven key/scale-relative diatonic chord pads are approved; the 3+4 physical arrangement is approved, while degree-to-pad mapping and chord-label presentation remain to be finalized. Do not treat the current prototype layout as a final decision.
 
+
+### ChordMatiK consolidated behavior — approved
+- **Seven-pad mapping:** Upper row ii / iii / vi; lower row I / IV / V / vii°. Roman numerals and chord names adapt to the selected Major, Natural Minor or Harmonic Minor scale.
+- **Key and scale:** Compact KEY + SCALE controls within ChordMatiK. Natural Minor is the default Minor variant.
+- **Smart switching:** A new chord takes priority over the previous chord; this does not disable Poly playback of multiple notes within a chord. Outgoing-voice release policy must be specified against One-shot/Gate semantics.
+- **Modifier combinations:** 7TH + 9TH is allowed; SUS4 replaces the chord third. Exact voicing conventions remain subject to musical QA. Modifier interactions retain approved short-tap latch / long-hold momentary behavior.
+- **STRUM:** Adjustable Slow–Fast slider; play chord tones Low → High. On Mono tracks, the Up 1/8-note arpeggio takes precedence; STRUM affects Poly chord articulation.
+- **Mono arpeggio:** Ascending, BPM-synced eighth notes.
+- **Poly voice cap:** Up to eight simultaneously sounding voices per track. Voice allocation/stealing and total system performance budget remain to be designed.
+- **Live key/scale changes:** Apply to the next triggered chord; already sounding voices are not retuned. Sequencer event representation and re-harmonization behavior remain open.
+- **Implementation status:** These are approved requirements, not features already present in minimatik.html.
+
 ## Sequencing
 16 steps per track, 7 tracks per scene, up to 64 scenes. Manual step plotting and live recording via PLAY + REC. Scene and track context must remain obvious. Song arrangement behavior is not yet decided.
 
