@@ -33,11 +33,17 @@
 - **Mono chord performance:** Arpeggio. When a chord is triggered on a Mono track, its notes are played sequentially rather than simultaneously. Arpeggio pattern/rate/retrigger rules remain open.
 - **Seven-button mapping:** NOT YET DECIDED. Review the real HiChord behavior before choosing MiniMatik's mapping. Do not assume the prototype's seven diatonic chords have been approved as final.
 
+## Approved — ChordMatiK scales (2026-11-27)
+- The seven chord pads follow the selected key and **selected scale mode: Major or Minor**.
+- Changing between Major and Minor changes the diatonic chord qualities available on the seven pads, without adding more performance pads.
+- Exact minor-scale variant (natural/harmonic/melodic), pad labels, chord inversions and key-change behavior during playback remain open.
+- This is a MiniMatik design decision, not a claim about HiChord's exact implementation.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK seven-button mapping; chord voicing, modifier types, Mono arpeggio rate/pattern, Poly voice limits and voice stealing.
+- ChordMatiK seven-button mapping and visual arrangement; minor-scale variant, chord voicing, modifier types, Mono arpeggio rate/pattern, Poly voice limits and voice stealing.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
