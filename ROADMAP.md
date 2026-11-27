@@ -48,3 +48,10 @@ See DECISIONS.md. PR numbering is provisional and may be refined before each con
 - **Documentation:** Contract ready at `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`; docs branch only, no application code changed.
 - **Implementation:** NOT STARTED. Antigravity must receive explicit owner authorization before coding; owner QA and merge approval remain separate gates.
 - **PR05 boundary:** Sequencer oscillator playback and `setInterval` scheduling remain PR05 work; do not claim they are resolved by PR04.
+
+## Roadmap sequencing decision — 2026-11-28
+- **PR05 stays Sequencer (PLANNED).** Implement audio-clock-backed playback of user-assigned samples, seven tracks, 16 steps and up to 64 scenes; detailed scope and acceptance criteria require a separate PR05 design/Task Contract before implementation.
+- **Sample Editing — dedicated follow-up after PR05 (PLANNED; PR number TBD).** Non-destructive **TRIM, PITCH, VOLUME, REVERSE** for user-imported/recorded samples. Preserve original audio; editing parameters remain reversible and adjustable. Design an iPad-friendly waveform and trim-handle interaction before assigning a PR number or preparing an implementation contract.
+- **Dependencies and ordering:** Do not delay PR05 for Sample Editing. Plan Sample Editing after PR05 and before final persistence/polish; adjust later PR numbering only through a separate explicit decision, preserving existing PR06 Mutate and PR07 Persistence labels until then.
+- **Out of scope now:** No sample-editor implementation, sequencer implementation, automatic PR renumbering or merges authorized by this documentation change.
+- **PR04 physical QA:** Owner reports five PASS results for Smart Switching, Modifiers/STRUM, Mono Arpeggio, One-shot/Gate and Multi-touch. PR04 is already merged; this records reported musical QA without claiming every regression check was performed.
