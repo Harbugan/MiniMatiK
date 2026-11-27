@@ -22,3 +22,10 @@ Every PR: narrow scope, implementation summary, test notes, known limitations, o
 
 ## Open design questions
 See DECISIONS.md. PR numbering is provisional and may be refined before each contract.
+
+
+## ChordMatiK design checkpoint — 2026-11-27
+**Product decisions substantially complete.** Approved: 3+4 layout and mapping, compact KEY + SCALE, Major/Natural Minor/Harmonic Minor, four modifiers above pads, limited modifier combinations, adjustable Low-to-High STRUM, Mono Up 1/8 arp, Smart switching, 8 voices/track, and next-trigger key/scale updates. **Not yet implementation-ready as a standalone PR:** finalize outgoing-voice behavior vs One-shot/Gate, note/voicing rules, recorded-event representation, modifier stacking and voice stealing. PR03 also depends on PR02 real sample playback.
+
+## Display/visual feedback discovery
+**PLANNED — design only:** Explore mode-reactive PS1 low-poly visuals, chord/parameter feedback, oscilloscope-style audio visualization, and optional low-poly cat mascot. Decide visual scope separately before adding any of these to implementation contracts; preserve readability and iPad performance.
