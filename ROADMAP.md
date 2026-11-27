@@ -7,7 +7,7 @@ Status legend: PLANNED / IN PROGRESS / QA / DONE. No implementation is approved 
 - Product design review: sampler, ChordMatiK, scene navigation, Mutate ergonomics. **PLANNED**
 
 ## Phase 2 — Real sample engine
-- **PR02 — Soundbank:** Import audio files and record microphone input into 19 initially empty slots; preview, clear, and assign samples to seven tracks. **PLANNED**
+- **PR02 — Soundbank:** Import audio files and record microphone input into 19 initially empty slots; preview, clear, and assign samples to seven tracks. **QA — PR open; physical iPad Safari QA and product-owner approval pending.**
 - **PR03 — ChordMatiK:** Perform pitched samples, chords and modifiers on the selected track. **PLANNED**
 - **PR04 — Sequencer:** Audio-clock-backed 16-step playback, live recording, seven tracks, and 64 scenes. **PLANNED**
 
