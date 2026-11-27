@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MiniMatik ミニマティック // CREATED BY H∆RBUGΛП</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mm-cream: #e8e3d5;
+      --mm-cream-dark: #cfc8b4;
+      --mm-cream-light: #f5f2e9;
+      --mm-charcoal: #222428;
+      --mm-charcoal-deep: #141518;
+      --mm-vermilion: #d93829;
+      --mm-vermilion-dark: #9e2115;
+      --te-blue: #2f80ed;
+      --te-green: #27ae60;
+      --te-orange: #f2994a;
+      --te-amber: #f2c94c;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--mm-cream);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .font-display-jp {
+      font-family: 'Chakra Petch', 'Noto Sans JP', sans-serif;
+    }
+
+    .font-jp {
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    /* Full-bleed edge-to-edge iPad 11" landscape shell */
+    .ipad-app-frame {
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--mm-cream-light) 0%, var(--mm-cream) 52%, var(--mm-cream-dark) 100%);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 3px solid #b5ae9a;
+    }
+
+    /* Dark recessed hardware bays */
+    .charcoal-bay {
+      background: linear-gradient(180deg, #1a1c20 0%, #25282d 100%);
+      box-shadow:
+        inset 0 3px 9px rgba(0, 0, 0, 0.88),
+        0 1px 0 rgba(255, 255, 255, 0.78);
+      border: 2px solid #121316;
+    }
+
+    /* Vermilion accent module */
+    .vermilion-badge {
+      background: linear-gradient(160deg, #ea493a 0%, var(--mm-vermilion) 65%, var(--mm-vermilion-dark) 100%);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 205, 195, 0.55),
+        0 2px 0 #851c11;
+      border: 1px solid #962015;
+    }
+
+    /* Ventilation grooves */
+    .vent-slot {
+      background: #222428;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.7);
+      border-radius: 2px;
+    }
+
+    /* PS1 Low-Poly CRT Screen */
+    .ps1-monitor-glass {
+      position: relative;
+      background: #070b14;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 28px rgba(0, 0, 0, 0.96),
+        inset 0 0 4px rgba(103, 232, 249, 0.35);
+    }
+
+    .ps1-monitor-glass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.36) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.03));
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    canvas#ps1Canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Tactile hardware buttons */
+    .hw-btn {
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background-color 0.1s ease;
+      box-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    }
+    .hw-btn:active, .hw-btn.is-pressed {
+      transform: translateY(2px);
+      box-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.9),
+        inset 0 1px 3px rgba(0, 0, 0, 0.45);
+    }
+
+    /* ChordMatiK Ergonomic 7-Button Keys */
+    .chord-key-lower {
+      background: linear-gradient(180deg, #f8f5ed 0%, #ded8c6 100%);
+      color: #181a1d;
+      border: 2px solid #9d9683;
+      box-shadow:
+        0 5px 0 #787160,
+        0 7px 10px rgba(0, 0, 0, 0.55),
+        inset 0 2px 0 #ffffff;
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
+    }
+    .chord-key-lower:active, .chord-key-lower.key-fired {
+      transform: translateY(4px);
+      background: linear-gradient(180deg, #ffe2c2 0%, #f5b97a 100%);
+      border-color: #d93829;
+      box-shadow: 0 1px 0 #665f50, inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .chord-key-upper {
+      background: linear-gradient(180deg, #3c4047 0%, #26292e 100%);
+      color: #f5f2e9;
+      border: 2px solid #141518;
+      box-shadow:
+        0 5px 0 #0d0e10,
+        0 7px 10px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
+    }
+    .chord-key-upper:active, .chord-key-upper.key-fired {
+      transform: translateY(4px);
+      background: linear-gradient(180deg, #ea493a 0%, #b5271a 100%);
+      box-shadow: 0 1px 0 #0d0e10, inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 4-Position Rotary Mode Encoder */
+    .rotary-encoder {
+      background: radial-gradient(circle at 32% 28%, #faf7ef 0%, #d2cbb6 68%, #a49c86 100%);
+      box-shadow:
+        0 5px 11px rgba(0, 0, 0, 0.68),
+        0 3px 0 #736c5a,
+        inset 0 2px 2px rgba(255, 255, 255, 0.92);
+      border: 2px solid #88806b;
+      transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Round Red PS1/Retro Analog X/Y Joystick */
+    .joystick-well {
+      background: radial-gradient(circle at 50% 50%, #111317 0%, #1c1f24 72%, #2c3038 100%);
+      box-shadow:
+        inset 0 4px 10px rgba(0, 0, 0, 0.95),
+        0 1px 0 rgba(255, 255, 255, 0.2);
+      touch-action: none;
+    }
+
+    .joystick-stick-cap {
+      background: radial-gradient(circle at 35% 30%, #ff6b5b 0%, #d93829 55%, #8f1c11 100%);
+      box-shadow:
+        0 5px 9px rgba(0, 0, 0, 0.8),
+        inset 0 2px 3px rgba(255, 210, 200, 0.75);
+      border: 1.5px solid #ff8c7e;
+      touch-action: none;
+    }
+
+    @keyframes recPulse {
+      0%, 49% { opacity: 1; box-shadow: 0 0 10px #ff2e1f; }
+      50%, 100% { opacity: 0.25; box-shadow: none; }
+    }
+    .rec-blink {
+      animation: recPulse 0.68s infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FULL-BLEED IPAD 11" LANDSCAPE WORKSTATION -->
+  <div class="ipad-app-frame">
+
+    <!-- =====================================================================
+         1. TOP HEADER BAR: BRAND + SCENE (01/64) + BPM + SOUNDBANK STATUS
+         ===================================================================== -->
+    <header class="grid grid-cols-12 gap-2.5 items-center bg-[#dcd5c2] rounded-xl px-3 py-2 border border-[#bbb39e] shadow-sm">
+
+      <!-- Left: MiniMatik Brand + Japanese Katakana + H∆RBUGΛП -->
+      <div class="col-span-12 md:col-span-5 flex items-center justify-between md:justify-start gap-2.5">
+        <div class="vermilion-badge px-2.5 py-1 rounded-lg text-white flex items-center gap-2 shrink-0">
+          <span class="font-display-jp font-bold text-base sm:text-lg tracking-tight leading-none">MiniMatik</span>
+          <span class="font-jp font-bold text-[11px] bg-black/25 px-1.5 py-0.5 rounded tracking-wider">ミニマティック</span>
+        </div>
+
+        <div class="leading-tight">
+          <div class="text-[10px] font-mono-tech font-extrabold tracking-widest text-[#1c1e22]">CREATED BY H∆RBUGΛП</div>
+          <div class="text-[8px] font-mono-tech text-[#575142] tracking-wider">32-BIT GTE SAMPLING WORKSTATION</div>
+        </div>
+
+        <!-- Industrial Vent Grooves -->
+        <div class="hidden xl:flex items-center gap-1 ml-1" aria-hidden="true">
+          <div class="vent-slot w-1 h-5"></div>
+          <div class="vent-slot w-1 h-5"></div>
+          <div class="vent-slot w-1 h-5"></div>
+          <div class="vent-slot w-1 h-5"></div>
+        </div>
+      </div>
+
+      <!-- Center: Scene Selector (01 to 64) + Quick Jump -->
+      <div class="col-span-7 md:col-span-4 flex items-center justify-center gap-2">
+        <div class="charcoal-bay rounded-xl px-2.5 py-1 flex items-center gap-2 text-white font-mono-tech">
+          <button id="scenePrevBtn" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">◀</button>
+          <div class="text-center px-1 leading-tight">
+            <div class="text-[8px] text-zinc-400">SCENE <span class="font-jp">場面</span></div>
+            <div id="headerSceneDisplay" class="text-xs sm:text-sm font-extrabold text-amber-300">01/64</div>
+          </div>
+          <button id="sceneNextBtn" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-2.5 py-1 rounded text-xs font-bold cursor-pointer">▶</button>
+          <button id="sceneJumpBtn" title="Jump +8 scenes" class="hw-btn bg-zinc-800 hover:bg-zinc-700 text-cyan-300 px-1.5 py-1 rounded text-[10px] font-bold cursor-pointer border border-zinc-700">+8</button>
+        </div>
+
+        <!-- BPM Control -->
+        <div class="charcoal-bay rounded-xl px-2 py-1 flex items-center gap-1.5 text-white font-mono-tech">
+          <button id="bpmDownBtn" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-1.5 py-1 rounded text-xs font-bold cursor-pointer">-</button>
+          <div class="text-center px-0.5 leading-tight">
+            <div class="text-[8px] text-zinc-400">BPM</div>
+            <div id="headerBpmDisplay" class="text-xs sm:text-sm font-extrabold text-cyan-300">120</div>
+          </div>
+          <button id="bpmUpBtn" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-1.5 py-1 rounded text-xs font-bold cursor-pointer">+</button>
+        </div>
+      </div>
+
+      <!-- Right: Soundbank Status Pill + Audio Toggle -->
+      <div class="col-span-5 md:col-span-3 flex items-center justify-end gap-2 font-mono-tech">
+        <div class="charcoal-bay rounded-xl px-2.5 py-1.5 flex items-center gap-2 text-white">
+          <span id="bankHeaderLed" class="w-2 h-2 rounded-full bg-amber-300"></span>
+          <span id="headerBankPill" class="text-xs font-extrabold text-amber-300">BANK 00/19</span>
+        </div>
+
+        <button id="audioToggleBtn" class="hw-btn bg-[#222428] hover:bg-black text-emerald-300 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1.5 cursor-pointer border border-zinc-700">
+          <span id="audioLed" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="audioLabel">AUDIO</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- =====================================================================
+         2. MAIN SPLIT WORKSPACE: LEFT PS1 DISPLAY + RIGHT ROTARY 4-MODE DECK
+         ===================================================================== -->
+    <main class="grid grid-cols-12 gap-3 min-h-0">
+
+      <!-- LEFT PANEL (5 Cols): PS1 LOW-POLY MONITOR -->
+      <section class="col-span-12 md:col-span-5 charcoal-bay rounded-2xl p-3 flex flex-col justify-between min-h-0">
+        <!-- Monitor Top Bezel -->
+        <div class="flex items-center justify-between text-[10px] font-mono-tech text-zinc-400 mb-1.5 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#d93829] shadow-[0_0_6px_#ef4444]"></span>
+            <span class="font-bold text-zinc-200 tracking-wider">PS1-GTE MONITOR</span>
+            <span class="font-jp text-[9px] text-zinc-500">低ポリゴン表示</span>
+          </div>
+          <span id="hudAutoStatus" class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-[9px] font-bold text-zinc-400">
+            AUTO: OFF
+          </span>
+        </div>
+
+        <!-- PS1 Low-Poly CRT Screen -->
+        <div class="ps1-monitor-glass rounded-xl border-2 border-black flex-1 w-full min-h-[175px] relative">
+          <canvas id="ps1Canvas" width="260" height="195"></canvas>
+
+          <!-- Top HUD Overlay -->
+          <div class="absolute top-2 left-2.5 right-2.5 flex justify-between items-start pointer-events-none z-20 font-mono-tech">
+            <div class="bg-black/75 px-2 py-1 rounded border border-cyan-400/40">
+              <div id="hudModeJp" class="text-[9px] font-jp text-cyan-400 leading-none">サウンドバンク</div>
+              <div id="hudModeLabel" class="text-xs sm:text-sm font-extrabold text-white tracking-wider mt-0.5">01. SAMPLER</div>
+            </div>
+            <div class="bg-black/75 px-2 py-1 rounded border border-amber-400/40 text-right">
+              <div id="hudSceneLabel" class="text-xs font-extrabold text-amber-300">SCN 01/64</div>
+              <div id="hudTrackLabel" class="text-[10px] font-bold text-emerald-300">TRK 1 [EMPTY]</div>
+            </div>
+          </div>
+
+          <!-- Center Dynamic Chord / Live Event Callout -->
+          <div id="hudCenterCallout" class="hidden absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none z-20">
+            <div class="bg-black/85 border-2 border-[#d93829] px-4 py-1.5 rounded-lg text-center shadow-lg">
+              <div class="text-[9px] font-mono-tech text-amber-300 tracking-widest">CHORDMATIK LIVE</div>
+              <div id="hudChordBigText" class="text-xl font-display-jp font-bold text-white tracking-wide">Cmaj7</div>
+            </div>
+          </div>
+
+          <!-- Bottom HUD Overlay -->
+          <div class="absolute bottom-2 left-2.5 right-2.5 flex justify-between items-end pointer-events-none z-20 font-mono-tech text-[10px]">
+            <div class="bg-black/75 px-2 py-0.5 rounded border border-white/15 text-zinc-200">
+              <span class="text-zinc-400">XY:</span>
+              <span id="hudXyReadout" class="font-bold text-cyan-300">0.00 / 0.00</span>
+            </div>
+            <div id="hudStateBadge" class="bg-[#d93829] text-white px-2 py-0.5 rounded font-bold tracking-wide">
+              READY // 120 BPM
+            </div>
+          </div>
+        </div>
+
+        <!-- Monitor Footer: Signal Routing Summary -->
+        <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech px-1">
+          <span class="text-zinc-400">ROUTING:</span>
+          <span id="routingSummaryText" class="text-amber-300 font-bold">BANK[00/19] → TRK 1 [NO SAMPLE]</span>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL (7 Cols): 4-POSITION ROTARY MODE DIAL + SWITCHABLE MODULE BAY -->
+      <section class="col-span-12 md:col-span-7 charcoal-bay rounded-2xl p-3.5 flex flex-col justify-between text-[#f5f2e9] min-h-0">
+
+        <!-- Top Rotary Mode Selector Bar -->
+        <div class="flex items-center justify-between gap-2.5 pb-2.5 mb-2.5 border-b border-zinc-700/80">
+          <div class="flex items-center gap-3">
+            <!-- Tactile 4-Position Rotary Encoder Knob -->
+            <button id="modeRotaryDial" title="Tap or scroll to rotate 4-mode dial"
+              class="rotary-encoder w-14 h-14 rounded-full flex items-center justify-center cursor-pointer relative focus:outline-none shrink-0">
+              <div class="w-9 h-9 rounded-full border border-[#9c947e] bg-[#e6e0cf] flex items-center justify-center shadow-inner">
+                <div class="w-1.5 h-4 bg-[#d93829] rounded-full -translate-y-2 shadow"></div>
+              </div>
+            </button>
+
+            <div>
+              <div class="text-[9px] font-mono-tech text-zinc-400 tracking-widest">4-POS ROTARY SELECTOR <span class="font-jp text-zinc-500">モード切替</span></div>
+              <div class="flex flex-wrap items-center gap-1 mt-1">
+                <button data-mode="SAMPLER" class="mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer transition">
+                  01.SAMPLER
+                </button>
+                <button data-mode="CHORDMATIK" class="mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer transition">
+                  02.CHORDMATIK
+                </button>
+                <button data-mode="SEQ" class="mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer transition">
+                  03.SEQ-16
+                </button>
+                <button data-mode="MUTATE" class="mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer transition">
+                  04.MUTATE
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden xl:block bg-black/50 px-2.5 py-1.5 rounded-lg border border-zinc-700 text-right font-mono-tech shrink-0">
+            <div id="deckJpTag" class="text-[9px] font-jp text-amber-300">サウンドバンク</div>
+            <div id="deckSubTag" class="text-xs font-bold text-cyan-300">00/19 EMPTY</div>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             MODE 01: SAMPLER (19-SLOT SOUNDBANK, STARTS AT 00/19)
+             ================================================================= -->
+        <div id="deck-SAMPLER" class="deck-panel flex-1 flex flex-col justify-between min-h-0">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="font-mono-tech text-xs">
+              <span class="text-zinc-400">SLOT</span>
+              <span id="samplerSlotId" class="text-amber-300 font-extrabold">01</span>:
+              <span id="samplerSlotState" class="text-zinc-400">EMPTY (0/19)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btnLoadSample" class="hw-btn bg-[#d93829] hover:bg-[#e84738] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
+                ● LOAD / REC SLOT
+              </button>
+              <button id="btnLoadDemoKit" class="hw-btn bg-[#2f80ed] hover:bg-[#3d8ef8] text-white text-[11px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
+                + DEMO KIT (7)
+              </button>
+              <button id="btnClearSlot" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 text-[11px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-pointer">
+                CLR
+              </button>
+            </div>
+          </div>
+
+          <!-- 19 Soundbank Slots Grid -->
+          <div id="soundbankGrid" class="grid grid-cols-5 sm:grid-cols-7 gap-2 my-auto">
+            <!-- Populated by JS: Slots 01 to 19 -->
+          </div>
+
+          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
+            <span>TAP SLOT TO LOAD/PREVIEW & ASSIGN TO ACTIVE TRACK</span>
+            <span id="ramUsageText" class="text-emerald-400 font-bold">SOUNDBANK: 00/19</span>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             MODE 02: CHORDMATIK (7-BUTTON HICHORD-STYLE ENGINE + MODIFIER)
+             ================================================================= -->
+        <div id="deck-CHORDMATIK" class="deck-panel hidden flex-1 flex-col justify-between min-h-0">
+          <!-- Top Row: Key Root, Submode (CHORD / NOTE / DRUM), Octave -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-black/45 p-2 rounded-xl border border-zinc-800 mb-2">
+            <div class="flex items-center gap-1 font-mono-tech text-xs">
+              <span class="text-[10px] text-zinc-400 mr-1">KEY:</span>
+              <div id="keyRootButtons" class="flex gap-1">
+                <!-- C D E F G A B -->
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1 bg-zinc-900 p-0.5 rounded-lg border border-zinc-700 font-mono-tech text-[10px]">
+              <button data-cm-mode="CHORD" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">CHORD</button>
+              <button data-cm-mode="NOTE" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">NOTE</button>
+              <button data-cm-mode="DRUM" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">DRUM</button>
+            </div>
+
+            <div class="flex items-center gap-1.5 font-mono-tech text-xs">
+              <button id="cmOctDown" class="hw-btn bg-zinc-700 px-2 py-0.5 rounded text-white font-bold cursor-pointer">-</button>
+              <span id="cmOctLabel" class="text-amber-300 font-bold">OCT 4</span>
+              <button id="cmOctUp" class="hw-btn bg-zinc-700 px-2 py-0.5 rounded text-white font-bold cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <!-- Staggered 7-Button ChordMatiK Matrix + 4-Way Modifier Pad -->
+          <div class="grid grid-cols-12 gap-3 items-center my-auto py-1">
+            <!-- Left 8 Cols: 3 Upper Buttons (ii, iii, vi) + 4 Lower Buttons (I, IV, V, vii°) -->
+            <div class="col-span-12 sm:col-span-8 flex flex-col gap-2.5">
+              <!-- Upper Row (3 staggered dark keys) -->
+              <div class="grid grid-cols-3 gap-2.5 px-5 sm:px-7">
+                <button data-degree="1" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">ii</span>
+                  <span id="degLabel-1" class="text-[11px] font-mono-tech text-amber-300 mt-1">Dm</span>
+                </button>
+                <button data-degree="2" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">iii</span>
+                  <span id="degLabel-2" class="text-[11px] font-mono-tech text-amber-300 mt-1">Em</span>
+                </button>
+                <button data-degree="5" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">vi</span>
+                  <span id="degLabel-5" class="text-[11px] font-mono-tech text-amber-300 mt-1">Am</span>
+                </button>
+              </div>
+
+              <!-- Lower Row (4 primary cream keys) -->
+              <div class="grid grid-cols-4 gap-2">
+                <button data-degree="0" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">I</span>
+                  <span id="degLabel-0" class="text-[11px] font-mono-tech font-extrabold text-[#d93829] mt-1">C</span>
+                </button>
+                <button data-degree="3" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">IV</span>
+                  <span id="degLabel-3" class="text-[11px] font-mono-tech font-extrabold text-[#2f80ed] mt-1">F</span>
+                </button>
+                <button data-degree="4" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">V</span>
+                  <span id="degLabel-4" class="text-[11px] font-mono-tech font-extrabold text-[#27ae60] mt-1">G</span>
+                </button>
+                <button data-degree="6" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">vii°</span>
+                  <span id="degLabel-6" class="text-[11px] font-mono-tech font-extrabold text-zinc-700 mt-1">B°</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right 4 Cols: 4-Way Chord Modifier Pad -->
+            <div class="col-span-12 sm:col-span-4 bg-[#16181c] p-2.5 rounded-2xl border border-zinc-700 flex flex-col items-center justify-center">
+              <div class="text-[9px] font-mono-tech text-zinc-400 mb-1.5 tracking-wider">MODIFIER <span class="font-jp">和音変形</span></div>
+              <div class="grid grid-cols-3 gap-1.5 w-32 h-28">
+                <div></div>
+                <button data-mod="7TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-cyan-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
+                  +7TH
+                </button>
+                <div></div>
+
+                <button data-mod="SUS4" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-amber-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
+                  SUS4
+                </button>
+                <div class="rounded-full bg-[#d93829] border-2 border-red-300/40 shadow-inner flex items-center justify-center">
+                  <div class="w-2 h-2 rounded-full bg-white/85"></div>
+                </div>
+                <button data-mod="9TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-emerald-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
+                  +9TH
+                </button>
+
+                <div></div>
+                <button data-mod="INV" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-orange-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
+                  MIN/INV
+                </button>
+                <div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
+            <span>CHORDMATIK 7-PAD // KEYS 1–7 OR TOUCH</span>
+            <span id="cmVoicingReadout" class="text-amber-300 font-bold">VOICING: C MAJOR</span>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             MODE 03: SEQ-16 (16-STEP SEQUENCER × 64 SCENES × 7 TRACKS)
+             ================================================================= -->
+        <div id="deck-SEQ" class="deck-panel hidden flex-1 flex-col justify-between min-h-0">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="font-mono-tech text-xs flex items-center gap-2">
+              <span class="text-zinc-300 font-bold">16-STEP MATRIX</span>
+              <span class="text-[10px] text-emerald-400">● = X/Y AUTO</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btnRndSteps" class="hw-btn bg-[#27ae60] hover:bg-[#2ecc71] text-white text-[10px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
+                RND PAT
+              </button>
+              <button id="btnCopySceneNext" class="hw-btn bg-[#2f80ed] hover:bg-[#3d8ef8] text-white text-[10px] font-mono-tech font-bold px-2.5 py-1 rounded-lg cursor-pointer">
+                COPY → SCN+1
+              </button>
+              <button id="btnClearSteps" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-zinc-200 text-[10px] font-mono-tech font-bold px-2 py-1 rounded-lg cursor-pointer">
+                CLR STEPS
+              </button>
+            </div>
+          </div>
+
+          <!-- 16-Step Tactile Grid -->
+          <div id="sequencerStepGrid" class="grid grid-cols-8 gap-2 my-auto">
+            <!-- Populated by JS: Steps 01 to 16 -->
+          </div>
+
+          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
+            <span>EDITING: <strong id="seqContextLabel" class="text-white">SCN 01 // TRK 1</strong></span>
+            <span>TAP STEP TO PLOT OR USE <strong class="text-red-400">LIVE REC</strong></span>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             MODE 04: MUTATE (CONFIGURE X/Y JOYSTICK TARGETS & AUTOMATION)
+             ================================================================= -->
+        <div id="deck-MUTATE" class="deck-panel hidden flex-1 flex-col justify-between min-h-0">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="font-mono-tech text-xs">
+              <span class="text-amber-300 font-bold">ANALOG STICK ROUTING</span>
+              <span class="font-jp text-[10px] text-zinc-400 ml-1">ミューテーター設定</span>
+            </div>
+            <button id="btnMutateClearAuto" class="hw-btn bg-[#d93829] hover:bg-[#eb493a] text-white text-[11px] font-mono-tech font-bold px-3 py-1 rounded-lg cursor-pointer">
+              ✕ CLR AUTO (TRK/SCN)
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
+            <!-- X-Axis Target Selector -->
+            <div class="bg-[#16181c] p-3 rounded-xl border border-zinc-700">
+              <div class="text-[10px] font-mono-tech text-cyan-300 font-bold mb-2">X-AXIS TARGET (HORIZONTAL)</div>
+              <div class="flex flex-col gap-1.5" id="xTargetGroup">
+                <button data-x-target="FILTER CUTOFF" class="x-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">FILTER CUTOFF</button>
+                <button data-x-target="BITCRUSH" class="x-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">BITCRUSH</button>
+                <button data-x-target="PITCH WARP" class="x-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">PITCH WARP</button>
+              </div>
+            </div>
+
+            <!-- Y-Axis Target Selector -->
+            <div class="bg-[#16181c] p-3 rounded-xl border border-zinc-700">
+              <div class="text-[10px] font-mono-tech text-amber-300 font-bold mb-2">Y-AXIS TARGET (VERTICAL)</div>
+              <div class="flex flex-col gap-1.5" id="yTargetGroup">
+                <button data-y-target="RESONANCE" class="y-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">RESONANCE</button>
+                <button data-y-target="STUTTER" class="y-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">STUTTER</button>
+                <button data-y-target="DELAY / SPACE" class="y-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer">DELAY / SPACE</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
+            <span>MOVE BOTTOM-LEFT STICK DURING <strong class="text-red-400">PLAY + REC</strong> TO RECORD MOTION</span>
+            <span id="autoStepCountLabel" class="text-emerald-400 font-bold">AUTO STEPS: 0/16</span>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- =====================================================================
+         3. PERSISTENT BOTTOM PERFORMANCE BAR:
+            LEFT: ALWAYS-VISIBLE RED PS1 X/Y JOYSTICK
+            CENTER: 7 TRACK SELECTORS (TRK 1–7)
+            RIGHT: TRANSPORT (PLAY, STOP, LIVE REC) + CLR AUTO
+         ===================================================================== -->
+    <footer class="grid grid-cols-12 gap-3 items-stretch">
+
+      <!-- LEFT (4 Cols): Always-Visible Red PS1/Retro Analog X/Y Joystick -->
+      <div class="col-span-12 md:col-span-4 charcoal-bay rounded-2xl px-3 py-2 flex items-center justify-between gap-3 text-white">
+        <div class="flex items-center gap-3">
+          <!-- Joystick Gimbal Well -->
+          <div id="joystickRing" class="p-1 rounded-full border-2 border-zinc-600 transition-colors">
+            <div id="joystickWell" class="joystick-well w-16 h-16 sm:w-18 sm:h-18 rounded-full relative flex items-center justify-center cursor-grab active:cursor-grabbing">
+              <!-- Crosshair lines -->
+              <div class="absolute inset-x-2 h-[1px] bg-white/10 pointer-events-none"></div>
+              <div class="absolute inset-y-2 w-[1px] bg-white/10 pointer-events-none"></div>
+              <!-- Red Analog Cap -->
+              <div id="joystickCap" class="joystick-stick-cap w-8 h-8 rounded-full absolute pointer-events-none flex items-center justify-center">
+                <div class="w-2.5 h-2.5 rounded-full bg-white/35 -translate-x-1 -translate-y-1"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="font-mono-tech leading-tight">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-extrabold text-white tracking-wider">MUTATE X/Y</span>
+              <span class="font-jp text-[9px] text-amber-300">操作</span>
+            </div>
+            <div id="joyTargetSummary" class="text-[9px] text-cyan-300 mt-0.5">X:CUTOFF / Y:RES</div>
+            <div id="joyCoordsLabel" class="text-[10px] text-zinc-300 font-bold mt-0.5">X:+0.00 Y:+0.00</div>
+            <div id="joyAutoBadge" class="inline-block mt-1 px-1.5 py-0.5 rounded bg-zinc-800 text-[8px] font-bold text-zinc-400">
+              MANUAL LIVE
+            </div>
+          </div>
+        </div>
+
+        <!-- Spring Return Toggle -->
+        <button id="btnJoyHoldToggle" title="Toggle spring-return vs hold position"
+          class="hw-btn bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1.5 rounded-lg font-mono-tech text-[9px] font-bold cursor-pointer border border-zinc-600 shrink-0">
+          SPRING
+        </button>
+      </div>
+
+      <!-- CENTER (4 Cols): 7 Track Selector Buttons (TRK 1 to TRK 7) -->
+      <div class="col-span-12 md:col-span-4 bg-[#d8d1be] rounded-2xl p-2.5 border-2 border-[#b5ad96] flex flex-col justify-between">
+        <div class="flex items-center justify-between text-[10px] font-mono-tech text-[#222428] mb-1 px-0.5">
+          <span class="font-extrabold">7-TRACK SELECT <span class="font-jp text-zinc-600">トラック</span></span>
+          <span class="text-[9px] text-zinc-600">TAP ACTIVE TO MUTE</span>
+        </div>
+        <div id="trackSelectorBar" class="grid grid-cols-7 gap-1.5 flex-1">
+          <!-- Populated by JS: T1..T7 -->
+        </div>
+      </div>
+
+      <!-- RIGHT (4 Cols): Transport (PLAY, STOP, LIVE REC) + Quick CLR AUTO -->
+      <div class="col-span-12 md:col-span-4 charcoal-bay rounded-2xl p-2.5 flex flex-col justify-between text-white">
+        <div class="flex items-center justify-between text-[10px] font-mono-tech mb-1 px-0.5">
+          <div class="flex items-center gap-1.5">
+            <span id="transportLed" class="w-2 h-2 rounded-full bg-zinc-700"></span>
+            <span id="transportStatusLabel" class="font-bold text-zinc-300">STOPPED</span>
+          </div>
+          <button id="btnFooterClrAuto" class="text-[9px] font-bold text-amber-300 hover:text-amber-200 underline cursor-pointer">
+            CLR AUTO
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button id="btnPlay" class="hw-btn bg-[#27ae60] hover:bg-[#2ecc71] text-white py-2 px-2 rounded-xl font-display-jp font-bold text-xs sm:text-sm tracking-wider flex items-center justify-center gap-1 cursor-pointer">
+            <span>▶</span> PLAY
+          </button>
+          <button id="btnStop" class="hw-btn bg-zinc-700 hover:bg-zinc-600 text-white py-2 px-2 rounded-xl font-display-jp font-bold text-xs sm:text-sm tracking-wider flex items-center justify-center gap-1 cursor-pointer">
+            <span>■</span> STOP
+          </button>
+          <button id="btnLiveRec" class="hw-btn bg-[#d93829] hover:bg-[#eb493a] text-white py-2 px-2 rounded-xl font-display-jp font-bold text-xs sm:text-sm tracking-wider flex items-center justify-center gap-1 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-white"></span> REC
+          </button>
+        </div>
+      </div>
+
+    </footer>
+  </div>
+
+  <script>
+    /**
+     * MiniMatik ミニマティック — CREATED BY H∆RBUGΛП
+     * Interactive iPad 11" Hardware-Style Groovebox & PS1 Low-Poly Workstation
+     */
+    const DECK_MODES = ['SAMPLER', 'CHORDMATIK', 'SEQ', 'MUTATE'];
+
+    const SAMPLE_NAMES = [
+      'KICK_909', 'SNARE_JP', 'PS1_CHIME', 'FM_BASS', 'HIHAT_CL',
+      'BRK_JUNGLE', 'VOX_HIT', 'ORCH_STAB', 'SUB_808', 'ZAP_FX',
+      'KOTO_PLK', 'TAPE_HISS', 'ACID_303', 'GTE_BELL', 'CLAP_94',
+      'RIM_SHOT', 'POLY_PAD', 'GLITCH_X', 'CRASH_19'
+    ];
+
+    const ROOT_NOTES = [
+      { name: 'C', semi: 0 },
+      { name: 'D', semi: 2 },
+      { name: 'E', semi: 4 },
+      { name: 'F', semi: 5 },
+      { name: 'G', semi: 7 },
+      { name: 'A', semi: 9 },
+      { name: 'B', semi: 11 }
+    ];
+
+    const DIATONIC_DEGREES = [
+      { degree: 'I',    offset: 0,  quality: 'maj', suffix: '' },
+      { degree: 'ii',   offset: 2,  quality: 'min', suffix: 'm' },
+      { degree: 'iii',  offset: 4,  quality: 'min', suffix: 'm' },
+      { degree: 'IV',   offset: 5,  quality: 'maj', suffix: '' },
+      { degree: 'V',    offset: 7,  quality: 'maj', suffix: '' },
+      { degree: 'vi',   offset: 9,  quality: 'min', suffix: 'm' },
+      { degree: 'vii°', offset: 11, quality: 'dim', suffix: '°' }
+    ];
+
+    const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    const state = {
+      modeIndex: 0, // 0: SAMPLER, 1: CHORDMATIK, 2: SEQ, 3: MUTATE
+      audioEnabled: true,
+      isPlaying: false,
+      isRecording: false,
+      bpm: 120,
+      currentStep: 0,
+      activeTrack: 0, // 0..6 (TRK 1..7)
+      currentScene: 0, // 0..63 (SCN 01..64)
+      selectedSlot: 0, // 0..18 (Slot 01..19)
+
+      // 19 Soundbank slots — starts completely empty at 00/19
+      soundbank: Array.from({ length: 19 }, (_, i) => ({
+        id: i + 1,
+        loaded: false,
+        name: null,
+        color: ['#d93829', '#2f80ed', '#27ae60', '#f2994a', '#9b51e0'][i % 5]
+      })),
+
+      // 7 Tracks
+      tracks: Array.from({ length: 7 }, (_, i) => ({
+        id: i + 1,
+        muted: false,
+        assignedSlot: null // 0..18 or null
+      })),
+
+      // 64 Scenes x 7 Tracks x 16 Steps (each step stores trigger + chordVoicing + recorded X/Y automation)
+      scenes: Array.from({ length: 64 }, () =>
+        Array.from({ length: 7 }, () =>
+          Array.from({ length: 16 }, () => ({
+            active: false,
+            midiNotes: null,
+            autoX: null, // -1..1 when recorded
+            autoY: null  // -1..1 when recorded
+          }))
+        )
+      ),
+
+      // ChordMatiK state
+      chordmatik: {
+        rootIndex: 0, // C
+        octave: 4,
+        subMode: 'CHORD', // 'CHORD' | 'NOTE' | 'DRUM'
+        activeMod: null, // '7TH' | 'SUS4' | '9TH' | 'INV' | null
+        lastVoicingName: 'C MAJOR'
+      },
+
+      // Persistent Analog X/Y Joystick state
+      joystick: {
+        x: 0, // -1 to +1
+        y: 0, // -1 to +1
+        isDragging: false,
+        springReturn: true,
+        xTarget: 'FILTER CUTOFF',
+        yTarget: 'RESONANCE'
+      },
+
+      visualPulse: 0,
+      chordCalloutTimer: null,
+      stepTimer: null
+    };
+
+    /* =========================================================================
+       WEB AUDIO API RETRO SYNTH & MUTATE DSP ENGINE
+       ========================================================================= */
+    let audioCtx = null;
+
+    function ensureAudioCtx() {
+      if (!state.audioEnabled) return null;
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playClick(freq = 920, dur = 0.025) {
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    }
+
+    function playMutatedVoice(midiNotes, duration = 0.36, waveOverride = null) {
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const jx = state.joystick.x; // -1..1
+      const jy = state.joystick.y; // -1..1
+      const mag = Math.min(1, Math.hypot(jx, jy));
+
+      // Create BiquadFilter shaped by Joystick X/Y
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      const baseCutoff = 1800 + jx * 1500;
+      filter.frequency.setValueAtTime(Math.max(140, Math.min(6000, baseCutoff)), now);
+      filter.Q.setValueAtTime(1 + Math.max(0, jy) * 14, now);
+
+      const masterGain = ctx.createGain();
+      const perVoice = 0.14 / Math.sqrt(midiNotes.length);
+      masterGain.gain.setValueAtTime(perVoice, now);
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration + Math.max(0, jy) * 0.25);
+
+      filter.connect(masterGain);
+      masterGain.connect(ctx.destination);
+
+      const wave = waveOverride || (state.joystick.xTarget === 'BITCRUSH' && Math.abs(jx) > 0.35 ? 'sawtooth' : 'triangle');
+
+      midiNotes.forEach((midi, idx) => {
+        const osc = ctx.createOscillator();
+        const freq = 440 * Math.pow(2, (midi - 69) / 12);
+        osc.type = wave;
+        osc.frequency.setValueAtTime(freq, now);
+
+        if (state.joystick.xTarget === 'PITCH WARP' && Math.abs(jx) > 0.08) {
+          osc.frequency.exponentialRampToValueAtTime(
+            Math.max(40, freq * (1 + jx * 0.45)),
+            now + duration * 0.85
+          );
+        } else if (mag > 0.2) {
+          osc.detune.setValueAtTime((idx % 2 === 0 ? 1 : -1) * mag * 22, now);
+        }
+
+        osc.connect(filter);
+        osc.start(now);
+        osc.stop(now + duration + 0.3);
+      });
+
+      state.visualPulse = 1.0;
+    }
+
+    /* =========================================================================
+       GLOBAL HUD & STATE SYNCHRONIZATION
+       ========================================================================= */
+    function getLoadedCount() {
+      return state.soundbank.filter(s => s.loaded).length;
+    }
+
+    function hasTrackAutomation(sceneIdx, trackIdx) {
+      return state.scenes[sceneIdx][trackIdx].some(st => st.autoX !== null || st.autoY !== null);
+    }
+
+    function countTrackAutoSteps(sceneIdx, trackIdx) {
+      return state.scenes[sceneIdx][trackIdx].filter(st => st.autoX !== null || st.autoY !== null).length;
+    }
+
+    function updateAllHUD() {
+      const modeName = DECK_MODES[state.modeIndex];
+      const loaded = getLoadedCount();
+      const loadedStr = String(loaded).padStart(2, '0');
+      const sceneStr = String(state.currentScene + 1).padStart(2, '0');
+      const trk = state.tracks[state.activeTrack];
+      const autoCount = countTrackAutoSteps(state.currentScene, state.activeTrack);
+
+      const jpTitles = {
+        SAMPLER: 'サウンドバンク',
+        CHORDMATIK: 'コードマティック',
+        SEQ: 'シーケンサー',
+        MUTATE: 'ミューテーター'
+      };
+
+      const modeDisplayLabels = {
+        SAMPLER: '01. SAMPLER',
+        CHORDMATIK: '02. CHORDMATIK',
+        SEQ: '03. SEQ-16',
+        MUTATE: '04. MUTATE'
+      };
+
+      document.getElementById('hudModeJp').textContent = jpTitles[modeName];
+      document.getElementById('hudModeLabel').textContent = modeDisplayLabels[modeName];
+      document.getElementById('deckJpTag').textContent = jpTitles[modeName];
+
+      if (modeName === 'SAMPLER') {
+        document.getElementById('deckSubTag').textContent = `${loadedStr}/19 SLOTS`;
+      } else if (modeName === 'CHORDMATIK') {
+        document.getElementById('deckSubTag').textContent = `${state.chordmatik.subMode} // KEY ${ROOT_NOTES[state.chordmatik.rootIndex].name}`;
+      } else if (modeName === 'SEQ') {
+        document.getElementById('deckSubTag').textContent = `SCN ${sceneStr}/64`;
+      } else {
+        document.getElementById('deckSubTag').textContent = `AUTO ${autoCount}/16`;
+      }
+
+      document.getElementById('headerSceneDisplay').textContent = `${sceneStr}/64`;
+      document.getElementById('hudSceneLabel').textContent = `SCN ${sceneStr}/64`;
+      document.getElementById('headerBpmDisplay').textContent = state.bpm;
+      document.getElementById('headerBankPill').textContent = `BANK ${loadedStr}/19`;
+
+      const assignedSlotObj = trk.assignedSlot !== null ? state.soundbank[trk.assignedSlot] : null;
+      const slotTag = assignedSlotObj && assignedSlotObj.loaded
+        ? `S${String(assignedSlotObj.id).padStart(2, '0')} ${assignedSlotObj.name}`
+        : 'EMPTY';
+
+      document.getElementById('hudTrackLabel').textContent = `TRK ${trk.id} [${trk.muted ? 'MUTE' : slotTag}]`;
+      document.getElementById('hudTrackLabel').className = trk.muted
+        ? 'text-[10px] font-bold text-red-400'
+        : 'text-[10px] font-bold text-emerald-300';
+
+      document.getElementById('routingSummaryText').textContent =
+        `BANK[${loadedStr}/19] → TRK ${trk.id} [${slotTag}]`;
+
+      document.getElementById('seqContextLabel').textContent = `SCN ${sceneStr} // TRK ${trk.id}`;
+      document.getElementById('autoStepCountLabel').textContent = `AUTO STEPS: ${autoCount}/16`;
+
+      // Automation status badge on PS1 screen + Joystick ring
+      const hudAuto = document.getElementById('hudAutoStatus');
+      const joyRing = document.getElementById('joystickRing');
+      const joyAutoBadge = document.getElementById('joyAutoBadge');
+
+      if (state.isPlaying && state.isRecording) {
+        hudAuto.textContent = 'AUTO: REC ●';
+        hudAuto.className = 'px-2 py-0.5 rounded bg-red-950 border border-red-500 text-[9px] font-bold text-red-300 animate-pulse';
+        joyRing.className = 'p-1 rounded-full border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.6)]';
+        joyAutoBadge.textContent = 'REC MOTION ●';
+        joyAutoBadge.className = 'inline-block mt-1 px-1.5 py-0.5 rounded bg-red-600 text-[8px] font-bold text-white';
+      } else if (state.isPlaying && autoCount > 0) {
+        hudAuto.textContent = `AUTO: PLAY (${autoCount})`;
+        hudAuto.className = 'px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500 text-[9px] font-bold text-emerald-300';
+        joyRing.className = 'p-1 rounded-full border-2 border-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.5)]';
+        joyAutoBadge.textContent = 'AUTO PLAYING';
+        joyAutoBadge.className = 'inline-block mt-1 px-1.5 py-0.5 rounded bg-emerald-600 text-[8px] font-bold text-white';
+      } else if (autoCount > 0) {
+        hudAuto.textContent = `AUTO: ARMED (${autoCount})`;
+        hudAuto.className = 'px-2 py-0.5 rounded bg-zinc-900 border border-emerald-500/50 text-[9px] font-bold text-emerald-400';
+        joyRing.className = 'p-1 rounded-full border-2 border-emerald-500/60';
+        joyAutoBadge.textContent = `STORED (${autoCount}/16)`;
+        joyAutoBadge.className = 'inline-block mt-1 px-1.5 py-0.5 rounded bg-zinc-800 text-[8px] font-bold text-emerald-300';
+      } else {
+        hudAuto.textContent = 'AUTO: OFF';
+        hudAuto.className = 'px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-[9px] font-bold text-zinc-400';
+        joyRing.className = 'p-1 rounded-full border-2 border-zinc-600';
+        joyAutoBadge.textContent = 'MANUAL LIVE';
+        joyAutoBadge.className = 'inline-block mt-1 px-1.5 py-0.5 rounded bg-zinc-800 text-[8px] font-bold text-zinc-400';
+      }
+
+      // Transport badge on PS1 screen
+      const stateBadge = document.getElementById('hudStateBadge');
+      if (state.isRecording) {
+        stateBadge.textContent = `● LIVE REC // STEP ${String(state.currentStep + 1).padStart(2, '0')}`;
+        stateBadge.className = 'bg-red-600 text-white px-2 py-0.5 rounded font-bold tracking-wide animate-pulse';
+      } else if (state.isPlaying) {
+        stateBadge.textContent = `▶ STEP ${String(state.currentStep + 1).padStart(2, '0')}/16 // ${state.bpm}`;
+        stateBadge.className = 'bg-emerald-600 text-white px-2 py-0.5 rounded font-bold tracking-wide';
+      } else {
+        stateBadge.textContent = `READY // ${state.bpm} BPM`;
+        stateBadge.className = 'bg-[#d93829] text-white px-2 py-0.5 rounded font-bold tracking-wide';
+      }
+    }
+
+    function switchDeckMode(idx) {
+      state.modeIndex = (idx + DECK_MODES.length) % DECK_MODES.length;
+      const modeName = DECK_MODES[state.modeIndex];
+
+      // 4-position rotary pointer angles
+      const angles = [-54, -18, 18, 54];
+      document.getElementById('modeRotaryDial').style.transform = `rotate(${angles[state.modeIndex]}deg)`;
+
+      document.querySelectorAll('.mode-tab').forEach(btn => {
+        const active = btn.dataset.mode === modeName;
+        btn.className = active
+          ? 'mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer bg-[#d93829] text-white shadow'
+          : 'mode-tab px-2 py-1 rounded-lg text-[11px] font-mono-tech font-bold cursor-pointer bg-zinc-800 text-zinc-400 hover:text-white';
+      });
+
+      document.querySelectorAll('.deck-panel').forEach(panel => {
+        panel.classList.add('hidden');
+        panel.classList.remove('flex');
+      });
+      const activePanel = document.getElementById(`deck-${modeName}`);
+      activePanel.classList.remove('hidden');
+      activePanel.classList.add('flex');
+
+      updateAllHUD();
+    }
+
+    /* =========================================================================
+       7-TRACK SELECTOR BAR (BOTTOM CENTER)
+       ========================================================================= */
+    function renderTrackBar() {
+      const bar = document.getElementById('trackSelectorBar');
+      bar.innerHTML = '';
+
+      state.tracks.forEach((trk, idx) => {
+        const isSel = idx === state.activeTrack;
+        const slotObj = trk.assignedSlot !== null ? state.soundbank[trk.assignedSlot] : null;
+        const slotCode = slotObj && slotObj.loaded ? `S${String(slotObj.id).padStart(2, '0')}` : '--';
+
+        const btn = document.createElement('button');
+        btn.className = `hw-btn py-1 px-0.5 rounded-lg font-mono-tech flex flex-col items-center justify-center cursor-pointer border ${
+          isSel
+            ? 'bg-[#222428] text-white border-black ring-2 ring-[#d93829]'
+            : 'bg-[#ebe5d5] text-[#222428] border-[#b5ad96] hover:bg-white'
+        }`;
+
+        const led = trk.muted
+          ? 'bg-red-500'
+          : (slotObj && slotObj.loaded ? 'bg-emerald-400 shadow-[0_0_5px_#34d399]' : 'bg-zinc-400');
+
+        btn.innerHTML = `
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full ${led}"></span>
+            <span class="text-[10px] font-extrabold">T${trk.id}</span>
+          </div>
+          <span class="text-[8px] font-bold ${isSel ? 'text-amber-300' : 'text-zinc-600'}">${trk.muted ? 'MUTE' : slotCode}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          if (state.activeTrack === idx) {
+            trk.muted = !trk.muted;
+            playClick(trk.muted ? 430 : 780);
+          } else {
+            state.activeTrack = idx;
+            playClick(880);
+          }
+          renderTrackBar();
+          renderSequencerGrid();
+          updateAllHUD();
+        });
+
+        bar.appendChild(btn);
+      });
+    }
+
+    /* =========================================================================
+       MODE 01: SAMPLER (19 SLOTS, STARTS AT 00/19)
+       ========================================================================= */
+    function renderSoundbankGrid() {
+      const grid = document.getElementById('soundbankGrid');
+      grid.innerHTML = '';
+
+      const sel = state.soundbank[state.selectedSlot];
+      document.getElementById('samplerSlotId').textContent = String(sel.id).padStart(2, '0');
+      document.getElementById('samplerSlotState').textContent = sel.loaded
+        ? `${sel.name} [LOADED]`
+        : `EMPTY (${String(getLoadedCount()).padStart(2, '0')}/19)`;
+      document.getElementById('samplerSlotState').className = sel.loaded
+        ? 'text-emerald-400 font-bold'
+        : 'text-zinc-400';
+
+      document.getElementById('ramUsageText').textContent =
+        `SOUNDBANK: ${String(getLoadedCount()).padStart(2, '0')}/19`;
+
+      state.soundbank.forEach((slot, idx) => {
+        const isSel = idx === state.selectedSlot;
+        const pad = document.createElement('button');
+        pad.className = `hw-btn p-1.5 rounded-xl font-mono-tech text-left flex flex-col justify-between h-12 sm:h-13 cursor-pointer border ${
+          isSel
+            ? 'ring-2 ring-amber-300 border-white ' + (slot.loaded ? 'bg-zinc-700' : 'bg-zinc-800')
+            : (slot.loaded ? 'bg-zinc-800 border-zinc-600 hover:bg-zinc-700' : 'bg-[#16181c] border-zinc-800 hover:border-zinc-600')
+        }`;
+
+        const dot = slot.loaded
+          ? `<span class="w-2 h-2 rounded-full" style="background:${slot.color}; box-shadow:0 0 6px ${slot.color}"></span>`
+          : `<span class="w-2 h-2 rounded-full border border-zinc-600"></span>`;
+
+        pad.innerHTML = `
+          <div class="flex items-center justify-between w-full">
+            <span class="text-[10px] font-extrabold ${slot.loaded ? 'text-white' : 'text-zinc-500'}">${String(slot.id).padStart(2, '0')}</span>
+            ${dot}
+          </div>
+          <div class="text-[8px] truncate w-full ${slot.loaded ? 'text-amber-300 font-bold' : 'text-zinc-600'}">
+            ${slot.loaded ? slot.name : 'EMPTY'}
+          </div>
+        `;
+
+        pad.addEventListener('click', () => {
+          state.selectedSlot = idx;
+          if (!slot.loaded) {
+            // Clicking an empty slot loads a sample immediately & assigns to active track
+            slot.loaded = true;
+            slot.name = SAMPLE_NAMES[idx];
+          }
+          state.tracks[state.activeTrack].assignedSlot = idx;
+          playMutatedVoice([48 + idx], 0.24, idx % 2 === 0 ? 'square' : 'triangle');
+
+          if (state.isRecording) {
+            state.scenes[state.currentScene][state.activeTrack][state.currentStep].active = true;
+            state.scenes[state.currentScene][state.activeTrack][state.currentStep].midiNotes = [48 + idx];
+            renderSequencerGrid();
+          }
+
+          renderSoundbankGrid();
+          renderTrackBar();
+          updateAllHUD();
+        });
+
+        grid.appendChild(pad);
+      });
+    }
+
+    /* =========================================================================
+       MODE 02: CHORDMATIK (7-BUTTON HICHORD-STYLE ENGINE)
+       ========================================================================= */
+    function renderChordMatiKUI() {
+      const rootWrap = document.getElementById('keyRootButtons');
+      rootWrap.innerHTML = '';
+      ROOT_NOTES.forEach((r, idx) => {
+        const b = document.createElement('button');
+        const active = idx === state.chordmatik.rootIndex;
+        b.className = `px-1.5 py-0.5 rounded font-bold cursor-pointer transition ${
+          active ? 'bg-[#d93829] text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+        }`;
+        b.textContent = r.name;
+        b.addEventListener('click', () => {
+          state.chordmatik.rootIndex = idx;
+          playClick(850);
+          renderChordMatiKUI();
+          updateAllHUD();
+        });
+        rootWrap.appendChild(b);
+      });
+
+      document.querySelectorAll('.cm-submode-btn').forEach(btn => {
+        const active = btn.dataset.cmMode === state.chordmatik.subMode;
+        btn.className = active
+          ? 'cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer bg-amber-300 text-black'
+          : 'cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer text-zinc-400 hover:text-white';
+      });
+
+      const rootSemi = ROOT_NOTES[state.chordmatik.rootIndex].semi;
+      DIATONIC_DEGREES.forEach((deg, idx) => {
+        const lbl = document.getElementById(`degLabel-${idx}`);
+        if (!lbl) return;
+        const noteName = NOTE_NAMES[(rootSemi + deg.offset) % 12];
+        if (state.chordmatik.subMode === 'DRUM') {
+          const drums = ['KICK', 'SNARE', 'HAT', 'CLAP', 'TOM', 'RIM', 'CRASH'];
+          lbl.textContent = drums[idx];
+        } else if (state.chordmatik.subMode === 'NOTE') {
+          lbl.textContent = `${noteName}${state.chordmatik.octave}`;
+        } else {
+          let suffix = deg.suffix;
+          if (state.chordmatik.activeMod === 'INV') suffix = deg.quality === 'maj' ? 'm' : '';
+          if (state.chordmatik.activeMod === '7TH') suffix += '7';
+          if (state.chordmatik.activeMod === 'SUS4') suffix = 'sus4';
+          if (state.chordmatik.activeMod === '9TH') suffix += '9';
+          lbl.textContent = `${noteName}${suffix}`;
+        }
+      });
+
+      document.querySelectorAll('.cm-mod-btn').forEach(btn => {
+        const active = btn.dataset.mod === state.chordmatik.activeMod;
+        btn.classList.toggle('ring-2', active);
+        btn.classList.toggle('ring-amber-300', active);
+        btn.classList.toggle('bg-zinc-700', active);
+      });
+
+      document.getElementById('cmOctLabel').textContent = `OCT ${state.chordmatik.octave}`;
+      updateAllHUD();
+    }
+
+    function triggerChordMatiKPad(degreeIdx, el = null) {
+      const rootSemi = ROOT_NOTES[state.chordmatik.rootIndex].semi;
+      const deg = DIATONIC_DEGREES[degreeIdx];
+      const baseMidi = (state.chordmatik.octave + 1) * 12 + rootSemi + deg.offset;
+      const noteName = NOTE_NAMES[(rootSemi + deg.offset) % 12];
+
+      let midiList = [];
+      let label = '';
+
+      if (state.chordmatik.subMode === 'DRUM') {
+        const drumNames = ['909 KICK', '808 SNARE', 'CLOSED HAT', 'SYN CLAP', 'LOW TOM', 'RIMSHOT', 'CYMBAL'];
+        midiList = [36 + degreeIdx * 4];
+        label = drumNames[degreeIdx];
+        playMutatedVoice(midiList, 0.16, degreeIdx % 2 === 0 ? 'sine' : 'sawtooth');
+      } else if (state.chordmatik.subMode === 'NOTE') {
+        midiList = [baseMidi];
+        label = `NOTE ${noteName}${state.chordmatik.octave}`;
+        playMutatedVoice(midiList, 0.34);
+      } else {
+        let quality = deg.quality;
+        if (state.chordmatik.activeMod === 'INV') {
+          quality = quality === 'maj' ? 'min' : 'maj';
+        }
+        let third = quality === 'maj' ? 4 : 3;
+        let fifth = quality === 'dim' ? 6 : 7;
+        label = `${noteName}${quality === 'min' ? 'm' : (quality === 'dim' ? '°' : ' MAJ')}`;
+
+        if (state.chordmatik.activeMod === 'SUS4') {
+          third = 5;
+          label = `${noteName}sus4`;
+        }
+
+        midiList = [baseMidi, baseMidi + third, baseMidi + fifth];
+
+        if (state.chordmatik.activeMod === '7TH') {
+          midiList.push(baseMidi + (quality === 'maj' ? 11 : 10));
+          label = `${noteName}${quality === 'maj' ? 'maj7' : 'm7'}`;
+        } else if (state.chordmatik.activeMod === '9TH') {
+          midiList.push(baseMidi + 14);
+          label = `${noteName}${quality === 'min' ? 'm9' : 'add9'}`;
+        }
+
+        playMutatedVoice(midiList, 0.45);
+      }
+
+      state.chordmatik.lastVoicingName = label;
+      document.getElementById('cmVoicingReadout').textContent = `VOICING: ${label}`;
+
+      // Show crisp callout on PS1 display
+      const banner = document.getElementById('hudCenterCallout');
+      document.getElementById('hudChordBigText').textContent = label;
+      banner.classList.remove('hidden');
+      clearTimeout(state.chordCalloutTimer);
+      state.chordCalloutTimer = setTimeout(() => banner.classList.add('hidden'), 1000);
+
+      // Live Record into current step of active Track & Scene
+      if (state.isRecording) {
+        const stepObj = state.scenes[state.currentScene][state.activeTrack][state.currentStep];
+        stepObj.active = true;
+        stepObj.midiNotes = [...midiList];
+        renderSequencerGrid();
+      }
+
+      if (el) {
+        el.classList.add('key-fired');
+        setTimeout(() => el.classList.remove('key-fired'), 140);
+      }
+    }
+
+    /* =========================================================================
+       MODE 03: SEQ-16 (16-STEP SEQUENCER + AUTOMATION DOTS)
+       ========================================================================= */
+    function renderSequencerGrid() {
+      const grid = document.getElementById('sequencerStepGrid');
+      grid.innerHTML = '';
+
+      const steps = state.scenes[state.currentScene][state.activeTrack];
+
+      steps.forEach((stepData, i) => {
+        const isPlayhead = state.isPlaying && state.currentStep === i;
+        const isQuarter = i % 4 === 0;
+        const hasAuto = stepData.autoX !== null || stepData.autoY !== null;
+
+        const btn = document.createElement('button');
+        btn.className = `hw-btn h-12 sm:h-14 rounded-xl font-mono-tech text-xs font-extrabold flex flex-col items-center justify-between p-1.5 cursor-pointer border ${
+          stepData.active
+            ? 'bg-[#d93829] text-white border-amber-300'
+            : (isQuarter ? 'bg-zinc-700 text-zinc-200 border-zinc-600' : 'bg-zinc-800 text-zinc-400 border-zinc-700')
+        } ${isPlayhead ? 'ring-2 ring-cyan-300 scale-[1.03]' : ''}`;
+
+        const topLed = isPlayhead
+          ? 'bg-cyan-300 shadow-[0_0_8px_#67e8f9]'
+          : (stepData.active ? 'bg-amber-300' : 'bg-zinc-950');
+
+        const autoDot = hasAuto
+          ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_#34d399]" title="Recorded X/Y Automation"></span>`
+          : `<span class="w-1.5 h-1.5"></span>`;
+
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full">
+            <span class="w-2 h-2 rounded-full ${topLed}"></span>
+            ${autoDot}
+          </div>
+          <span>${String(i + 1).padStart(2, '0')}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          stepData.active = !stepData.active;
+          if (stepData.active) {
+            const defaultMidi = [48 + ROOT_NOTES[state.chordmatik.rootIndex].semi + (state.activeTrack * 3)];
+            stepData.midiNotes = defaultMidi;
+            playMutatedVoice(defaultMidi, 0.2);
+          } else {
+            stepData.midiNotes = null;
+            playClick(480);
+          }
+          renderSequencerGrid();
+        });
+
+        grid.appendChild(btn);
+      });
+    }
+
+    /* =========================================================================
+       MODE 04: MUTATE TARGET CONFIG UI
+       ========================================================================= */
+    function renderMutateConfigUI() {
+      document.querySelectorAll('.x-target-btn').forEach(btn => {
+        const active = btn.dataset.xTarget === state.joystick.xTarget;
+        btn.className = active
+          ? 'x-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer bg-cyan-500 text-black'
+          : 'x-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer bg-zinc-800 text-zinc-300 hover:bg-zinc-700';
+      });
+
+      document.querySelectorAll('.y-target-btn').forEach(btn => {
+        const active = btn.dataset.yTarget === state.joystick.yTarget;
+        btn.className = active
+          ? 'y-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer bg-amber-400 text-black'
+          : 'y-target-btn hw-btn text-left px-2.5 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer bg-zinc-800 text-zinc-300 hover:bg-zinc-700';
+      });
+
+      const shortX = state.joystick.xTarget.split(' ')[0];
+      const shortY = state.joystick.yTarget.split(' ')[0];
+      document.getElementById('joyTargetSummary').textContent = `X:${shortX} / Y:${shortY}`;
+    }
+
+    function clearTrackAutomation() {
+      state.scenes[state.currentScene][state.activeTrack].forEach(st => {
+        st.autoX = null;
+        st.autoY = null;
+      });
+      if (!state.joystick.isDragging) {
+        setJoystickPosition(0, 0);
+      }
+      playClick(380);
+      renderSequencerGrid();
+      updateAllHUD();
+    }
+
+    /* =========================================================================
+       PERSISTENT ANALOG X/Y JOYSTICK & AUTOMATION RECORD/PLAYBACK
+       ========================================================================= */
+    const joystickWell = document.getElementById('joystickWell');
+    const joystickCap = document.getElementById('joystickCap');
+
+    function setJoystickPosition(nx, ny) {
+      // Clamp within unit circle
+      const len = Math.hypot(nx, ny);
+      if (len > 1) {
+        nx /= len;
+        ny /= len;
+      }
+      state.joystick.x = nx;
+      state.joystick.y = ny;
+
+      const maxTravelPx = 18;
+      joystickCap.style.transform = `translate(${nx * maxTravelPx}px, ${-ny * maxTravelPx}px)`;
+
+      const xStr = (nx >= 0 ? '+' : '') + nx.toFixed(2);
+      const yStr = (ny >= 0 ? '+' : '') + ny.toFixed(2);
+      document.getElementById('joyCoordsLabel').textContent = `X:${xStr} Y:${yStr}`;
+      document.getElementById('hudXyReadout').textContent = `${xStr} / ${yStr}`;
+    }
+
+    function handleJoystickPointer(clientX, clientY) {
+      const rect = joystickWell.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const radius = rect.width / 2;
+      const nx = (clientX - cx) / radius;
+      const ny = -(clientY - cy) / radius;
+      setJoystickPosition(nx, ny);
+
+      // If Playing + Recording, record live X/Y motion onto current step immediately
+      if (state.isPlaying && state.isRecording) {
+        const stepObj = state.scenes[state.currentScene][state.activeTrack][state.currentStep];
+        stepObj.autoX = state.joystick.x;
+        stepObj.autoY = state.joystick.y;
+        updateAllHUD();
+      }
+    }
+
+    joystickWell.addEventListener('pointerdown', (e) => {
+      state.joystick.isDragging = true;
+      joystickWell.setPointerCapture(e.pointerId);
+      handleJoystickPointer(e.clientX, e.clientY);
+    });
+
+    joystickWell.addEventListener('pointermove', (e) => {
+      if (!state.joystick.isDragging) return;
+      handleJoystickPointer(e.clientX, e.clientY);
+    });
+
+    joystickWell.addEventListener('pointerup', () => {
+      state.joystick.isDragging = false;
+      if (state.joystick.springReturn) {
+        setJoystickPosition(0, 0);
+      }
+    });
+
+    /* =========================================================================
+       SEQUENCER CLOCK, TRANSPORT & AUTOMATION PLAYBACK
+       ========================================================================= */
+    function startTransport() {
+      stopTransport(false);
+      state.isPlaying = true;
+      state.currentStep = 0;
+      executeStepTick();
+      const stepMs = (60 / state.bpm / 4) * 1000;
+      state.stepTimer = setInterval(executeStepTick, stepMs);
+      updateTransportIndicators();
+    }
+
+    function stopTransport(resetStep = true) {
+      if (state.stepTimer) {
+        clearInterval(state.stepTimer);
+        state.stepTimer = null;
+      }
+      state.isPlaying = false;
+      state.isRecording = false;
+      if (resetStep) state.currentStep = 0;
+      if (!state.joystick.isDragging && state.joystick.springReturn) {
+        setJoystickPosition(0, 0);
+      }
+      updateTransportIndicators();
+      renderSequencerGrid();
+      updateAllHUD();
+    }
+
+    function executeStepTick() {
+      const sceneTracks = state.scenes[state.currentScene];
+      const activeTrackStep = sceneTracks[state.activeTrack][state.currentStep];
+
+      // 1. Handle X/Y Automation Record or Playback on Active Track
+      if (state.isRecording && state.joystick.isDragging) {
+        activeTrackStep.autoX = state.joystick.x;
+        activeTrackStep.autoY = state.joystick.y;
+      } else if (!state.joystick.isDragging && activeTrackStep.autoX !== null && activeTrackStep.autoY !== null) {
+        // Playback stored X/Y automation visually and sonically!
+        setJoystickPosition(activeTrackStep.autoX, activeTrackStep.autoY);
+      }
+
+      // 2. Trigger audio for all unmuted tracks with active steps
+      let anyHit = false;
+      sceneTracks.forEach((trackSteps, trkIdx) => {
+        const stepObj = trackSteps[state.currentStep];
+        if (stepObj.active && !state.tracks[trkIdx].muted) {
+          anyHit = true;
+          const notes = stepObj.midiNotes || [48 + ROOT_NOTES[state.chordmatik.rootIndex].semi + trkIdx * 4];
+          playMutatedVoice(notes, 0.18, trkIdx % 2 === 0 ? 'triangle' : 'square');
+        }
+      });
+
+      if (anyHit) state.visualPulse = 1.0;
+
+      renderSequencerGrid();
+      updateAllHUD();
+      state.currentStep = (state.currentStep + 1) % 16;
+    }
+
+    function updateTransportIndicators() {
+      const led = document.getElementById('transportLed');
+      const lbl = document.getElementById('transportStatusLabel');
+
+      if (state.isRecording) {
+        led.className = 'w-2 h-2 rounded-full bg-red-500 rec-blink';
+        lbl.textContent = 'LIVE REC';
+        lbl.className = 'font-bold text-red-400';
+      } else if (state.isPlaying) {
+        led.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+        lbl.textContent = 'RUNNING';
+        lbl.className = 'font-bold text-emerald-400';
+      } else {
+        led.className = 'w-2 h-2 rounded-full bg-zinc-700';
+        lbl.textContent = 'STOPPED';
+        lbl.className = 'font-bold text-zinc-400';
+      }
+    }
+
+    /* =========================================================================
+       PS1 LOW-POLY 3D SOFTWARE RENDERER (GTE Integer Snapping + Flat Shading)
+       ========================================================================= */
+    const ps1Canvas = document.getElementById('ps1Canvas');
+    const ps1Ctx = ps1Canvas.getContext('2d');
+
+    const POLY_VERTS = [
+      [0, 1.4, 0],
+      [1.15, 0.25, 0],
+      [0, 0.25, 1.15],
+      [-1.15, 0.25, 0],
+      [0, 0.25, -1.15],
+      [0.85, -0.55, 0.85],
+      [-0.85, -0.55, 0.85],
+      [-0.85, -0.55, -0.85],
+      [0.85, -0.55, -0.85],
+      [0, -1.4, 0]
+    ];
+
+    const POLY_FACES = [
+      { v: [0, 1, 2], rgb: [217, 56, 41] },   // Vermilion
+      { v: [0, 2, 3], rgb: [47, 128, 237] },  // Blue
+      { v: [0, 3, 4], rgb: [232, 227, 213] }, // Cream
+      { v: [0, 4, 1], rgb: [39, 174, 96] },   // Green
+      { v: [1, 5, 2], rgb: [242, 153, 74] },  // Orange
+      { v: [2, 5, 6], rgb: [56, 189, 248] },
+      { v: [2, 6, 3], rgb: [217, 56, 41] },
+      { v: [3, 6, 7], rgb: [168, 85, 247] },
+      { v: [3, 7, 4], rgb: [39, 174, 96] },
+      { v: [4, 7, 8], rgb: [250, 204, 21] },
+      { v: [4, 8, 1], rgb: [47, 128, 237] },
+      { v: [1, 8, 5], rgb: [232, 227, 213] },
+      { v: [9, 6, 5], rgb: [217, 56, 41] },
+      { v: [9, 7, 6], rgb: [47, 128, 237] },
+      { v: [9, 8, 7], rgb: [39, 174, 96] },
+      { v: [9, 5, 8], rgb: [242, 153, 74] }
+    ];
+
+    let rotY = 0;
+
+    function animatePS1Display(nowMs) {
+      const w = ps1Canvas.width;
+      const h = ps1Canvas.height;
+      const t = nowMs * 0.001;
+
+      state.visualPulse *= 0.89;
+      const jx = state.joystick.x;
+      const jy = state.joystick.y;
+      const joyMag = Math.min(1, Math.hypot(jx, jy));
+
+      // 1. 90s Japanese PS1 Horizon Gradient
+      const sky = ps1Ctx.createLinearGradient(0, 0, 0, h);
+      if (state.isRecording || joyMag > 0.72) {
+        sky.addColorStop(0, '#290808');
+        sky.addColorStop(0.55, '#471010');
+        sky.addColorStop(1, '#08090c');
+      } else {
+        sky.addColorStop(0, '#070f1f');
+        sky.addColorStop(0.55, '#122747');
+        sky.addColorStop(1, '#070a12');
+      }
+      ps1Ctx.fillStyle = sky;
+      ps1Ctx.fillRect(0, 0, w, h);
+
+      // 2. Retro Perspective Floor Grid
+      ps1Ctx.strokeStyle = state.isPlaying ? 'rgba(56, 189, 248, 0.36)' : 'rgba(120, 155, 200, 0.22)';
+      ps1Ctx.lineWidth = 1;
+      const horizon = h * 0.56;
+      const zScroll = (t * (state.isPlaying ? state.bpm / 45 : 0.35)) % 1;
+
+      for (let i = -6; i <= 6; i++) {
+        ps1Ctx.beginPath();
+        ps1Ctx.moveTo(w / 2 + i * 11, horizon);
+        ps1Ctx.lineTo(w / 2 + i * 52, h);
+        ps1Ctx.stroke();
+      }
+      for (let r = 0; r < 6; r++) {
+        const p = (r + zScroll) / 6;
+        const y = Math.round(horizon + Math.pow(p, 1.7) * (h - horizon));
+        ps1Ctx.beginPath();
+        ps1Ctx.moveTo(0, y);
+        ps1Ctx.lineTo(w, y);
+        ps1Ctx.stroke();
+      }
+
+      // 3. 19-Slot Soundbank Orbit Ring (Wireframe for 0/19 empty, solid for loaded)
+      const loadedCount = getLoadedCount();
+      for (let i = 0; i < 19; i++) {
+        const theta = (i / 19) * Math.PI * 2 + t * 0.6;
+        const ox = Math.round(w / 2 + Math.cos(theta) * 85);
+        const oy = Math.round(h / 2 + Math.sin(theta) * 28);
+        const slot = state.soundbank[i];
+
+        if (slot.loaded) {
+          ps1Ctx.fillStyle = slot.color;
+          ps1Ctx.fillRect(ox - 3, oy - 3, 6, 6);
+          ps1Ctx.strokeStyle = '#ffffff';
+          ps1Ctx.strokeRect(ox - 3, oy - 3, 6, 6);
+        } else {
+          ps1Ctx.strokeStyle = 'rgba(148, 163, 184, 0.36)';
+          ps1Ctx.strokeRect(ox - 2, oy - 2, 4, 4);
+        }
+      }
+
+      // 4. Low-Poly 3D Polyhedron warped in real time by X/Y Joystick & Automation
+      rotY += 0.018 * (state.isPlaying ? 1.8 : 0.75) + jx * 0.045;
+      const rotX = 0.35 + Math.sin(t * 1.2) * 0.16 + jy * 0.65;
+      const meshScale = 37 + state.visualPulse * 12 + loadedCount * 0.35;
+
+      const projected = POLY_VERTS.map((v, idx) => {
+        let [x, y, z] = v;
+
+        if (joyMag > 0.04) {
+          x += Math.sin(t * 7 + idx * 1.7) * jx * 0.52;
+          y += Math.cos(t * 6 + idx * 1.3) * jy * 0.48;
+          z += Math.sin(t * 5 + idx) * joyMag * 0.32;
+        }
+
+        const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+        const x1 = x * cosY - z * sinY;
+        const z1 = z * cosY + x * sinY;
+
+        const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+        const y2 = y * cosX - z1 * sinX;
+        const z2 = z1 * cosX + y * sinX;
+
+        const fov = 4.2;
+        const persp = fov / (fov + z2 + 2.2);
+        const snap = joyMag > 0.6 ? 2.5 : 1.5;
+
+        return {
+          x: Math.round((w / 2 + x1 * meshScale * persp) / snap) * snap,
+          y: Math.round((h / 2 - y2 * meshScale * persp) / snap) * snap,
+          z: z2
+        };
+      });
+
+      const sortedFaces = POLY_FACES.map(f => {
+        const v0 = projected[f.v[0]], v1 = projected[f.v[1]], v2 = projected[f.v[2]];
+        return { f, v0, v1, v2, z: (v0.z + v1.z + v2.z) / 3 };
+      }).sort((a, b) => b.z - a.z);
+
+      sortedFaces.forEach(({ f, v0, v1, v2, z }) => {
+        const cross = (v1.x - v0.x) * (v2.y - v0.y) - (v1.y - v0.y) * (v2.x - v0.x);
+        if (cross < 0) return;
+
+        const shade = Math.max(0.35, Math.min(1.25, 0.95 - z * 0.25 + state.visualPulse * 0.3));
+        const r = Math.min(255, Math.round(f.rgb[0] * shade));
+        const g = Math.min(255, Math.round(f.rgb[1] * shade));
+        const b = Math.min(255, Math.round(f.rgb[2] * shade));
+
+        ps1Ctx.beginPath();
+        ps1Ctx.moveTo(v0.x, v0.y);
+        ps1Ctx.lineTo(v1.x, v1.y);
+        ps1Ctx.lineTo(v2.x, v2.y);
+        ps1Ctx.closePath();
+
+        if (loadedCount === 0 && DECK_MODES[state.modeIndex] === 'SAMPLER') {
+          ps1Ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.22)`;
+          ps1Ctx.fill();
+          ps1Ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+          ps1Ctx.lineWidth = 1;
+          ps1Ctx.stroke();
+        } else {
+          ps1Ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ps1Ctx.fill();
+          ps1Ctx.strokeStyle = 'rgba(10, 15, 28, 0.65)';
+          ps1Ctx.lineWidth = 1;
+          ps1Ctx.stroke();
+        }
+      });
+
+      requestAnimationFrame(animatePS1Display);
+    }
+
+    /* =========================================================================
+       EVENT LISTENERS
+       ========================================================================= */
+    const rotaryDial = document.getElementById('modeRotaryDial');
+    rotaryDial.addEventListener('click', () => {
+      playClick(1050, 0.03);
+      switchDeckMode(state.modeIndex + 1);
+    });
+    rotaryDial.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      playClick(1050, 0.02);
+      switchDeckMode(state.modeIndex + (e.deltaY > 0 ? 1 : -1));
+    }, { passive: false });
+
+    document.querySelectorAll('.mode-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClick(1000);
+        switchDeckMode(DECK_MODES.indexOf(btn.dataset.mode));
+      });
+    });
+
+    // Audio Toggle
+    document.getElementById('audioToggleBtn').addEventListener('click', () => {
+      state.audioEnabled = !state.audioEnabled;
+      document.getElementById('audioLed').className = state.audioEnabled
+        ? 'w-2 h-2 rounded-full bg-emerald-400'
+        : 'w-2 h-2 rounded-full bg-zinc-600';
+      if (state.audioEnabled) playClick(1150);
+    });
+
+    // Scene & BPM Controls
+    document.getElementById('scenePrevBtn').addEventListener('click', () => {
+      state.currentScene = (state.currentScene - 1 + 64) % 64;
+      playClick(740);
+      renderSequencerGrid();
+      updateAllHUD();
+    });
+    document.getElementById('sceneNextBtn').addEventListener('click', () => {
+      state.currentScene = (state.currentScene + 1) % 64;
+      playClick(840);
+      renderSequencerGrid();
+      updateAllHUD();
+    });
+    document.getElementById('sceneJumpBtn').addEventListener('click', () => {
+      state.currentScene = (state.currentScene + 8) % 64;
+      playClick(940);
+      renderSequencerGrid();
+      updateAllHUD();
+    });
+    document.getElementById('bpmDownBtn').addEventListener('click', () => {
+      state.bpm = Math.max(60, state.bpm - 5);
+      if (state.isPlaying) startTransport();
+      updateAllHUD();
+    });
+    document.getElementById('bpmUpBtn').addEventListener('click', () => {
+      state.bpm = Math.min(200, state.bpm + 5);
+      if (state.isPlaying) startTransport();
+      updateAllHUD();
+    });
+
+    // Sampler Controls
+    document.getElementById('btnLoadSample').addEventListener('click', () => {
+      const slot = state.soundbank[state.selectedSlot];
+      slot.loaded = true;
+      slot.name = SAMPLE_NAMES[state.selectedSlot];
+      state.tracks[state.activeTrack].assignedSlot = state.selectedSlot;
+      playMutatedVoice([48 + state.selectedSlot], 0.24, 'square');
+      renderSoundbankGrid();
+      renderTrackBar();
+      updateAllHUD();
+    });
+
+    document.getElementById('btnLoadDemoKit').addEventListener('click', () => {
+      for (let i = 0; i < 7; i++) {
+        state.soundbank[i].loaded = true;
+        state.soundbank[i].name = SAMPLE_NAMES[i];
+        state.tracks[i].assignedSlot = i;
+      }
+      playMutatedVoice([48, 55, 60], 0.28);
+      renderSoundbankGrid();
+      renderTrackBar();
+      updateAllHUD();
+    });
+
+    document.getElementById('btnClearSlot').addEventListener('click', () => {
+      const slot = state.soundbank[state.selectedSlot];
+      slot.loaded = false;
+      slot.name = null;
+      state.tracks.forEach(t => {
+        if (t.assignedSlot === state.selectedSlot) t.assignedSlot = null;
+      });
+      playClick(360);
+      renderSoundbankGrid();
+      renderTrackBar();
+      updateAllHUD();
+    });
+
+    // ChordMatiK 7 Pads, Submode & Modifier Pad
+    document.querySelectorAll('[data-degree]').forEach(pad => {
+      pad.addEventListener('pointerdown', () => {
+        triggerChordMatiKPad(Number(pad.dataset.degree), pad);
+      });
+    });
+
+    document.querySelectorAll('.cm-submode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.chordmatik.subMode = btn.dataset.cmMode;
+        playClick(900);
+        renderChordMatiKUI();
+      });
+    });
+
+    document.querySelectorAll('.cm-mod-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mod = btn.dataset.mod;
+        state.chordmatik.activeMod = state.chordmatik.activeMod === mod ? null : mod;
+        playClick(980);
+        renderChordMatiKUI();
+      });
+    });
+
+    document.getElementById('cmOctDown').addEventListener('click', () => {
+      state.chordmatik.octave = Math.max(2, state.chordmatik.octave - 1);
+      playClick(620);
+      renderChordMatiKUI();
+    });
+    document.getElementById('cmOctUp').addEventListener('click', () => {
+      state.chordmatik.octave = Math.min(6, state.chordmatik.octave + 1);
+      playClick(880);
+      renderChordMatiKUI();
+    });
+
+    // Keyboard shortcuts (1..7 for ChordMatiK pads, Space for Play/Stop)
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return;
+      if (e.key >= '1' && e.key <= '7') {
+        const deg = Number(e.key) - 1;
+        const el = document.querySelector(`[data-degree="${deg}"]`);
+        triggerChordMatiKPad(deg, el);
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        state.isPlaying ? stopTransport() : startTransport();
+      }
+    });
+
+    // Sequencer Buttons
+    document.getElementById('btnRndSteps').addEventListener('click', () => {
+      const steps = state.scenes[state.currentScene][state.activeTrack];
+      const rootSemi = ROOT_NOTES[state.chordmatik.rootIndex].semi;
+      steps.forEach((st, i) => {
+        st.active = Math.random() > (i % 4 === 0 ? 0.25 : 0.72);
+        st.midiNotes = st.active ? [48 + rootSemi + (i % 7) * 2] : null;
+      });
+      playMutatedVoice([60, 67], 0.18);
+      renderSequencerGrid();
+    });
+
+    document.getElementById('btnCopySceneNext').addEventListener('click', () => {
+      const nextScene = (state.currentScene + 1) % 64;
+      state.scenes[nextScene] = state.scenes[state.currentScene].map(trk =>
+        trk.map(st => ({
+          active: st.active,
+          midiNotes: st.midiNotes ? [...st.midiNotes] : null,
+          autoX: st.autoX,
+          autoY: st.autoY
+        }))
+      );
+      state.currentScene = nextScene;
+      playClick(1100);
+      renderSequencerGrid();
+      updateAllHUD();
+    });
+
+    document.getElementById('btnClearSteps').addEventListener('click', () => {
+      state.scenes[state.currentScene][state.activeTrack].forEach(st => {
+        st.active = false;
+        st.midiNotes = null;
+      });
+      playClick(380);
+      renderSequencerGrid();
+    });
+
+    // Mutate Target Buttons & Clear Automation Buttons
+    document.querySelectorAll('.x-target-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.joystick.xTarget = btn.dataset.xTarget;
+        playClick(950);
+        renderMutateConfigUI();
+      });
+    });
+
+    document.querySelectorAll('.y-target-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.joystick.yTarget = btn.dataset.yTarget;
+        playClick(950);
+        renderMutateConfigUI();
+      });
+    });
+
+    document.getElementById('btnMutateClearAuto').addEventListener('click', clearTrackAutomation);
+    document.getElementById('btnFooterClrAuto').addEventListener('click', clearTrackAutomation);
+
+    // Joystick Spring/Hold Toggle
+    const joyHoldBtn = document.getElementById('btnJoyHoldToggle');
+    joyHoldBtn.addEventListener('click', () => {
+      state.joystick.springReturn = !state.joystick.springReturn;
+      joyHoldBtn.textContent = state.joystick.springReturn ? 'SPRING' : 'HOLD';
+      joyHoldBtn.classList.toggle('text-amber-300', !state.joystick.springReturn);
+      if (state.joystick.springReturn && !state.joystick.isDragging) {
+        setJoystickPosition(0, 0);
+      }
+      playClick(820);
+    });
+
+    // Transport Controls
+    document.getElementById('btnPlay').addEventListener('click', () => {
+      if (!state.isPlaying) startTransport();
+    });
+
+    document.getElementById('btnStop').addEventListener('click', () => {
+      stopTransport(true);
+      playClick(400);
+    });
+
+    document.getElementById('btnLiveRec').addEventListener('click', () => {
+      state.isRecording = !state.isRecording;
+      if (state.isRecording && !state.isPlaying) {
+        startTransport();
+        state.isRecording = true;
+      }
+      playClick(state.isRecording ? 1280 : 520);
+      updateTransportIndicators();
+      updateAllHUD();
+    });
+
+    /* =========================================================================
+       BOOT APPLICATION
+       ========================================================================= */
+    window.onload = () => {
+      renderTrackBar();
+      renderSoundbankGrid();
+      renderChordMatiKUI();
+      renderSequencerGrid();
+      renderMutateConfigUI();
+      switchDeckMode(0);
+      setJoystickPosition(0, 0);
+      requestAnimationFrame(animatePS1Display);
+    };
+  </script>
+</body>
+</html>
