@@ -4,32 +4,21 @@
  * Handles on-demand microphone permission, Tap Record / Tap Stop capture,
  * cancellation, empty-capture detection, and guaranteed MediaStream track cleanup.
  */
-(function (root, factory) {
-  const api = factory();
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = api;
-  }
-  if (root) {
-    root.MiniMatikRecorder = api;
-  }
-})(typeof window !== 'undefined' ? window : globalThis, function () {
-  'use strict';
+export const PREFERRED_MIME_TYPES = [
+  'audio/webm;codecs=opus',
+  'audio/webm',
+  'audio/mp4',
+  'audio/ogg;codecs=opus',
+  'audio/aac'
+];
 
-  const PREFERRED_MIME_TYPES = [
-    'audio/webm;codecs=opus',
-    'audio/webm',
-    'audio/mp4',
-    'audio/ogg;codecs=opus',
-    'audio/aac'
-  ];
-
-  class SampleRecordError extends Error {
-    constructor(code, message) {
-      super(message);
-      this.name = 'SampleRecordError';
-      this.code = code;
-    }
+export class SampleRecordError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'SampleRecordError';
+    this.code = code;
   }
+}
 
   function checkRecordingSupport() {
     if (typeof window !== 'undefined' && window.isSecureContext === false) {
@@ -383,13 +372,10 @@
     };
   }
 
-  return {
-    PREFERRED_MIME_TYPES,
-    SampleRecordError,
-    checkRecordingSupport,
-    pickSupportedMimeType,
-    mapMicrophoneError,
-    stopStreamTracks,
-    createRecorderController
-  };
-});
+export {
+  checkRecordingSupport,
+  pickSupportedMimeType,
+  mapMicrophoneError,
+  stopStreamTracks,
+  createRecorderController
+};

@@ -1,0 +1,27 @@
+/* MiniMatik — Design Tokens & Typography Classes */
+
+:root {
+  --mm-cream: #e8e3d5;
+  --mm-cream-dark: #cfc8b4;
+  --mm-cream-light: #f5f2e9;
+  --mm-charcoal: #222428;
+  --mm-charcoal-deep: #141518;
+  --mm-vermilion: #d93829;
+  --mm-vermilion-dark: #9e2115;
+  --te-blue: #2f80ed;
+  --te-green: #27ae60;
+  --te-orange: #f2994a;
+  --te-amber: #f2c94c;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-display-jp {
+  font-family: 'Chakra Petch', 'Noto Sans JP', sans-serif;
+}
+
+.font-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+}

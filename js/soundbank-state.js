@@ -4,21 +4,10 @@
  * Pure state helpers for the 19-slot soundbank and 7-track routing model.
  * No factory samples, no preset names, no synthetic fallbacks.
  */
-(function (root, factory) {
-  const api = factory();
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = api;
-  }
-  if (root) {
-    root.MiniMatikSoundbank = api;
-  }
-})(typeof window !== 'undefined' ? window : globalThis, function () {
-  'use strict';
-
-  const SLOT_COUNT = 19;
-  const TRACK_COUNT = 7;
-  const MAX_NAME_LENGTH = 32;
-  const SLOT_COLORS = ['#d93829', '#2f80ed', '#27ae60', '#f2994a', '#9b51e0'];
+export const SLOT_COUNT = 19;
+export const TRACK_COUNT = 7;
+const MAX_NAME_LENGTH = 32;
+export const SLOT_COLORS = ['#d93829', '#2f80ed', '#27ae60', '#f2994a', '#9b51e0'];
 
   function createEmptySlot(index) {
     return {
@@ -215,21 +204,17 @@
     };
   }
 
-  return {
-    SLOT_COUNT,
-    TRACK_COUNT,
-    SLOT_COLORS,
-    createEmptySlot,
-    createEmptySoundbank,
-    createInitialTracks,
-    formatSlotNumber,
-    formatDuration,
-    sanitizeSampleName,
-    buildRecordingName,
-    getLoadedCount,
-    getTracksForSlot,
-    storeSampleInSlot,
-    assignSlotToTrack,
-    clearSlot
-  };
-});
+export {
+  createEmptySlot,
+  createEmptySoundbank,
+  createInitialTracks,
+  formatSlotNumber,
+  formatDuration,
+  sanitizeSampleName,
+  buildRecordingName,
+  getLoadedCount,
+  getTracksForSlot,
+  storeSampleInSlot,
+  assignSlotToTrack,
+  clearSlot
+};
