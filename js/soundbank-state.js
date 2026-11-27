@@ -35,7 +35,10 @@ export const SLOT_COLORS = ['#d93829', '#2f80ed', '#27ae60', '#f2994a', '#9b51e0
     return Array.from({ length: TRACK_COUNT }, (_, i) => ({
       id: i + 1,
       muted: false,
-      assignedSlot: null // 0..18 or null
+      assignedSlot: null,       // 0..18 or null
+      playbackMode: 'ONE_SHOT', // 'ONE_SHOT' | 'GATE' (approved default: One-shot)
+      voiceMode: 'POLY',        // 'POLY' | 'MONO' (approved default: Poly)
+      pitchMode: 'TAPE'         // 'TAPE' (PR04 fixed; real Stretch DSP is a future task)
     }));
   }
 

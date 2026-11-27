@@ -9,6 +9,11 @@ import {
   createInitialTracks,
   getLoadedCount as getSoundbankLoadedCount
 } from './soundbank-state.js';
+import {
+  CHROMATIC_ROOTS,
+  NOTE_NAMES,
+  STRUM_DEFAULT_MS
+} from './chordmatik-theory.js';
 
 export const DECK_MODES = ['SAMPLER', 'CHORDMATIK', 'SEQ', 'MUTATE'];
 
@@ -26,30 +31,13 @@ export const MODE_DISPLAY_LABELS = {
   MUTATE: '04. MUTATE'
 };
 
-export const ROOT_NOTES = [
-  { name: 'C', semi: 0 },
-  { name: 'D', semi: 2 },
-  { name: 'E', semi: 4 },
-  { name: 'F', semi: 5 },
-  { name: 'G', semi: 7 },
-  { name: 'A', semi: 9 },
-  { name: 'B', semi: 11 }
-];
+// All 12 chromatic keys (C through B)
+export const ROOT_NOTES = CHROMATIC_ROOTS;
 
-export const DIATONIC_DEGREES = [
-  { degree: 'I',    offset: 0,  quality: 'maj', suffix: '' },
-  { degree: 'ii',   offset: 2,  quality: 'min', suffix: 'm' },
-  { degree: 'iii',  offset: 4,  quality: 'min', suffix: 'm' },
-  { degree: 'IV',   offset: 5,  quality: 'maj', suffix: '' },
-  { degree: 'V',    offset: 7,  quality: 'maj', suffix: '' },
-  { degree: 'vi',   offset: 9,  quality: 'min', suffix: 'm' },
-  { degree: 'vii°', offset: 11, quality: 'dim', suffix: '°' }
-];
-
-export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+export { NOTE_NAMES };
 
 export function createInitialScenes() {
-  // 64 Scenes x 7 Tracks x 16 Steps (each step stores trigger + chordVoicing + recorded X/Y automation)
+  // 64 Scenes x 7 Tracks x 16 Steps (each step stores trigger + absolute midiNotes + recorded X/Y automation)
   return Array.from({ length: 64 }, () =>
     Array.from({ length: 7 }, () =>
       Array.from({ length: 16 }, () => ({
@@ -77,7 +65,7 @@ export function createInitialState() {
     // 19 Soundbank slots — starts genuinely empty at 00/19 (no factory samples)
     soundbank: createEmptySoundbank(),
 
-    // 7 Tracks — all unassigned on fresh load
+    // 7 Tracks — all unassigned on fresh load, defaults: ONE_SHOT / TAPE / POLY
     tracks: createInitialTracks(),
 
     // Sampler PR02 UI & capture state
@@ -95,13 +83,20 @@ export function createInitialState() {
 
     scenes: createInitialScenes(),
 
-    // ChordMatiK state
+    // ChordMatiK PR04 state
     chordmatik: {
-      rootIndex: 0, // C
+      rootIndex: 0, // 0..11 (C..B)
+      scaleMode: 'MAJOR', // 'MAJOR' | 'NATURAL_MINOR' | 'HARMONIC_MINOR'
       octave: 4,
       subMode: 'CHORD', // 'CHORD' | 'NOTE' | 'DRUM'
-      activeMod: null, // '7TH' | 'SUS4' | '9TH' | 'INV' | null
-      lastVoicingName: 'C MAJOR'
+      strumMs: STRUM_DEFAULT_MS, // 20..150 ms
+      modifiers: {
+        '7TH': false,
+        'SUS4': false,
+        '9TH': false,
+        'STRUM': false
+      },
+      lastVoicingName: 'C MAJ'
     },
 
     // Persistent Analog X/Y Joystick state

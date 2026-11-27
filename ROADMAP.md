@@ -9,7 +9,7 @@ Status legend: PLANNED / IN PROGRESS / QA / DONE. No implementation is approved 
 ## Phase 2 — Modular foundation and real sample engine
 - **PR03 — Modular Foundation:** Extract HTML/CSS/JS into maintainable modules and update NordicWay FTPS deployment for multi-file assets. **DONE — merged to main; user reports physical QA passed.** Contract: `TASKS/PR03-MODULAR-FOUNDATION.md`.
 - **PR02 — Soundbank:** Import audio files and record microphone input into 19 initially empty slots; preview, clear, and assign samples to seven tracks. **DONE — merged to main (PR #1); user reports testing completed.**
-- **PR04 — ChordMatiK Audio Engine:** Real assigned-sample performance, diatonic chords/modifiers, Smart Chord Priority, Gate/One-shot and 8-voice management. **PLANNED — DESIGN APPROVED; CONTRACT READY; NOT IMPLEMENTED.** Contract: `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
+- **PR04 — ChordMatiK Audio Engine:** Real assigned-sample performance, diatonic chords/modifiers, Smart Chord Priority, Gate/One-shot and 8-voice management. **QA — IMPLEMENTED ON FEATURE BRANCH; PENDING PHYSICAL IPAD QA & OWNER APPROVAL.** Contract: `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
 - **PR05 — Sequencer:** Audio-clock-backed 16-step playback, live recording, seven tracks, and 64 scenes. **PLANNED**
 
 ## Phase 3 — Mutate

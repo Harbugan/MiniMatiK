@@ -1,14 +1,28 @@
 /**
- * MiniMatik — Shared Web Audio Context, Tactile Click & Legacy Prototype Synth
+ * MiniMatik — Shared Web Audio Context, Sample Voice Engine & Legacy SEQ-16 Prototype Synth
  *
- * Exposes the shared AudioContext manager for PR02 real sample decode/preview
- * and isolates temporary legacy oscillator voices used by ChordMatiK and SEQ-16
- * until future audio-engine PRs. Never used for soundbank loading or preview.
+ * Exposes the shared AudioContext manager for PR02 sample decode/preview and the
+ * PR04 user-sample performance engine for ChordMatiK. Isolates temporary legacy
+ * oscillator voices used ONLY by unmigrated SEQ-16 prototype calls until PR05.
+ * Never used for soundbank loading, sample preview, or ChordMatiK performance.
  */
 import { state } from './state.js';
 import { createAudioContextManager } from './sample-decoder.js';
+import { createSampleVoiceEngine } from './sample-voice-engine.js';
 
 export const audioCtxManager = createAudioContextManager();
+
+export const sampleVoiceEngine = createSampleVoiceEngine(audioCtxManager, {
+  getBpm: () => state.bpm,
+  isAudioEnabled: () => state.audioEnabled,
+  onAudioActivity: () => {
+    state.visualPulse = 1.0;
+  }
+});
+
+export function stopAllPerformanceAudio() {
+  sampleVoiceEngine.stopAll();
+}
 
 export function ensureAudioCtx() {
   if (!state.audioEnabled) return null;
@@ -39,8 +53,9 @@ export function playClick(freq = 920, dur = 0.025) {
   osc.stop(ctx.currentTime + dur);
 }
 
-// LEGACY PROTOTYPE BEHAVIOR (PR04/PR05): Temporary oscillator synth used only by
-// ChordMatiK and SEQ-16 prototype triggers. Not routed from soundbank samples.
+// LEGACY PROTOTYPE BEHAVIOR (PR05): Temporary oscillator synth retained ONLY for
+// still-unmigrated SEQ-16 step/RND PAT/playback triggers until PR05.
+// Never call from ChordMatiK, soundbank loading, or sample preview.
 export function playMutatedVoice(midiNotes, duration = 0.36, waveOverride = null) {
   const ctx = ensureAudioCtx();
   if (!ctx) return;

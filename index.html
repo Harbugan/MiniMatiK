@@ -308,104 +308,143 @@
         </div>
 
         <!-- =================================================================
-             MODE 02: CHORDMATIK (7-BUTTON HICHORD-STYLE ENGINE + MODIFIER)
+             MODE 02: CHORDMATIK (REAL USER-SAMPLE 7-PAD INSTRUMENT — PR04)
              ================================================================= -->
-        <div id="deck-CHORDMATIK" class="deck-panel hidden flex-1 flex-col justify-between min-h-0">
-          <!-- Top Row: Key Root, Submode (CHORD / NOTE / DRUM), Octave -->
-          <div class="flex flex-wrap items-center justify-between gap-2 bg-black/45 p-2 rounded-xl border border-zinc-800 mb-2">
-            <div class="flex items-center gap-1 font-mono-tech text-xs">
-              <span class="text-[10px] text-zinc-400 mr-1">KEY:</span>
-              <div id="keyRootButtons" class="flex gap-1">
-                <!-- C D E F G A B -->
-              </div>
+        <div id="deck-CHORDMATIK" class="deck-panel hidden flex-1 flex-col justify-between min-h-0 gap-1.5">
+          <!-- Control Row 1: Chromatic KEY, SCALE (MAJ/MIN/HARM), Submode (CHORD/NOTE/DRUM), Octave -->
+          <div class="flex flex-wrap items-center justify-between gap-1.5 bg-black/45 px-2 py-1.5 rounded-xl border border-zinc-800">
+            <!-- Chromatic KEY Selector (12 keys: C..B) -->
+            <div class="flex items-center gap-1 font-mono-tech text-[11px]">
+              <span class="text-[9px] text-zinc-400 font-bold">KEY</span>
+              <button id="cmKeyPrev" type="button" aria-label="Previous key" class="hw-btn bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-1.5 py-0.5 rounded font-bold cursor-pointer border border-zinc-700">◀</button>
+              <select id="cmKeySelect" aria-label="Musical key" class="bg-[#d93829] text-white font-mono-tech font-extrabold text-[11px] px-1.5 py-0.5 rounded border border-red-400/40 cursor-pointer focus:outline-none">
+                <option value="0">C</option>
+                <option value="1">C#</option>
+                <option value="2">D</option>
+                <option value="3">D#</option>
+                <option value="4">E</option>
+                <option value="5">F</option>
+                <option value="6">F#</option>
+                <option value="7">G</option>
+                <option value="8">G#</option>
+                <option value="9">A</option>
+                <option value="10">A#</option>
+                <option value="11">B</option>
+              </select>
+              <button id="cmKeyNext" type="button" aria-label="Next key" class="hw-btn bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-1.5 py-0.5 rounded font-bold cursor-pointer border border-zinc-700">▶</button>
             </div>
 
-            <div class="flex items-center gap-1 bg-zinc-900 p-0.5 rounded-lg border border-zinc-700 font-mono-tech text-[10px]">
-              <button data-cm-mode="CHORD" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">CHORD</button>
-              <button data-cm-mode="NOTE" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">NOTE</button>
-              <button data-cm-mode="DRUM" class="cm-submode-btn px-2 py-1 rounded font-bold cursor-pointer">DRUM</button>
+            <!-- SCALE Selector: Major, Natural Minor (default minor), Harmonic Minor -->
+            <div class="flex items-center gap-0.5 bg-zinc-900 p-0.5 rounded-lg border border-zinc-700 font-mono-tech text-[10px]" role="group" aria-label="Scale mode">
+              <button type="button" data-cm-scale="MAJOR" title="Major Scale" class="cm-scale-btn px-2 py-0.5 rounded font-bold cursor-pointer">MAJ</button>
+              <button type="button" data-cm-scale="NATURAL_MINOR" title="Natural Minor Scale (default minor)" class="cm-scale-btn px-2 py-0.5 rounded font-bold cursor-pointer">MIN</button>
+              <button type="button" data-cm-scale="HARMONIC_MINOR" title="Harmonic Minor Scale" class="cm-scale-btn px-2 py-0.5 rounded font-bold cursor-pointer">HARM</button>
             </div>
 
-            <div class="flex items-center gap-1.5 font-mono-tech text-xs">
-              <button id="cmOctDown" class="hw-btn bg-zinc-700 px-2 py-0.5 rounded text-white font-bold cursor-pointer">-</button>
-              <span id="cmOctLabel" class="text-amber-300 font-bold">OCT 4</span>
-              <button id="cmOctUp" class="hw-btn bg-zinc-700 px-2 py-0.5 rounded text-white font-bold cursor-pointer">+</button>
-            </div>
-          </div>
-
-          <!-- Staggered 7-Button ChordMatiK Matrix + 4-Way Modifier Pad -->
-          <div class="grid grid-cols-12 gap-3 items-center my-auto py-1">
-            <!-- Left 8 Cols: 3 Upper Buttons (ii, iii, vi) + 4 Lower Buttons (I, IV, V, vii°) -->
-            <div class="col-span-12 sm:col-span-8 flex flex-col gap-2.5">
-              <!-- Upper Row (3 staggered dark keys) -->
-              <div class="grid grid-cols-3 gap-2.5 px-5 sm:px-7">
-                <button data-degree="1" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">ii</span>
-                  <span id="degLabel-1" class="text-[11px] font-mono-tech text-amber-300 mt-1">Dm</span>
-                </button>
-                <button data-degree="2" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">iii</span>
-                  <span id="degLabel-2" class="text-[11px] font-mono-tech text-amber-300 mt-1">Em</span>
-                </button>
-                <button data-degree="5" class="chord-key-upper h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-sm sm:text-base font-display-jp font-bold leading-none">vi</span>
-                  <span id="degLabel-5" class="text-[11px] font-mono-tech text-amber-300 mt-1">Am</span>
-                </button>
-              </div>
-
-              <!-- Lower Row (4 primary cream keys) -->
-              <div class="grid grid-cols-4 gap-2">
-                <button data-degree="0" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">I</span>
-                  <span id="degLabel-0" class="text-[11px] font-mono-tech font-extrabold text-[#d93829] mt-1">C</span>
-                </button>
-                <button data-degree="3" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">IV</span>
-                  <span id="degLabel-3" class="text-[11px] font-mono-tech font-extrabold text-[#2f80ed] mt-1">F</span>
-                </button>
-                <button data-degree="4" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">V</span>
-                  <span id="degLabel-4" class="text-[11px] font-mono-tech font-extrabold text-[#27ae60] mt-1">G</span>
-                </button>
-                <button data-degree="6" class="chord-key-lower h-16 sm:h-18 rounded-xl flex flex-col items-center justify-center cursor-pointer">
-                  <span class="text-base sm:text-lg font-display-jp font-black leading-none">vii°</span>
-                  <span id="degLabel-6" class="text-[11px] font-mono-tech font-extrabold text-zinc-700 mt-1">B°</span>
-                </button>
-              </div>
+            <!-- Submode Selector: CHORD / NOTE / DRUM -->
+            <div class="flex items-center gap-0.5 bg-zinc-900 p-0.5 rounded-lg border border-zinc-700 font-mono-tech text-[10px]" role="group" aria-label="ChordMatiK submode">
+              <button type="button" data-cm-mode="CHORD" class="cm-submode-btn px-2 py-0.5 rounded font-bold cursor-pointer">CHORD</button>
+              <button type="button" data-cm-mode="NOTE" class="cm-submode-btn px-2 py-0.5 rounded font-bold cursor-pointer">NOTE</button>
+              <button type="button" data-cm-mode="DRUM" class="cm-submode-btn px-2 py-0.5 rounded font-bold cursor-pointer">DRUM</button>
             </div>
 
-            <!-- Right 4 Cols: 4-Way Chord Modifier Pad -->
-            <div class="col-span-12 sm:col-span-4 bg-[#16181c] p-2.5 rounded-2xl border border-zinc-700 flex flex-col items-center justify-center">
-              <div class="text-[9px] font-mono-tech text-zinc-400 mb-1.5 tracking-wider">MODIFIER <span class="font-jp">和音変形</span></div>
-              <div class="grid grid-cols-3 gap-1.5 w-32 h-28">
-                <div></div>
-                <button data-mod="7TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-cyan-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
-                  +7TH
-                </button>
-                <div></div>
-
-                <button data-mod="SUS4" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-amber-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
-                  SUS4
-                </button>
-                <div class="rounded-full bg-[#d93829] border-2 border-red-300/40 shadow-inner flex items-center justify-center">
-                  <div class="w-2 h-2 rounded-full bg-white/85"></div>
-                </div>
-                <button data-mod="9TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-emerald-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
-                  +9TH
-                </button>
-
-                <div></div>
-                <button data-mod="INV" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-orange-300 rounded-lg font-mono-tech text-[10px] font-extrabold flex items-center justify-center cursor-pointer border border-zinc-600">
-                  MIN/INV
-                </button>
-                <div></div>
-              </div>
+            <!-- Octave Control -->
+            <div class="flex items-center gap-1 font-mono-tech text-[11px]">
+              <button id="cmOctDown" type="button" aria-label="Octave down" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-1.5 py-0.5 rounded text-white font-bold cursor-pointer">-</button>
+              <span id="cmOctLabel" class="text-amber-300 font-bold text-[10px] w-10 text-center">OCT 4</span>
+              <button id="cmOctUp" type="button" aria-label="Octave up" class="hw-btn bg-zinc-700 hover:bg-zinc-600 px-1.5 py-0.5 rounded text-white font-bold cursor-pointer">+</button>
             </div>
           </div>
 
-          <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
-            <span>CHORDMATIK 7-PAD // <span class="text-zinc-500">LEGACY SYNTH (PR03)</span></span>
-            <span id="cmVoicingReadout" class="text-amber-300 font-bold">VOICING: C MAJOR</span>
+          <!-- Control Row 2: Per-Track Playback (1-SHOT/GATE, POLY/MONO, TAPE REF C4) + STRUM Slow-Fast Slider -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-[#16181c] px-2 py-1 rounded-xl border border-zinc-800 font-mono-tech text-[10px]">
+            <div class="flex items-center gap-1.5">
+              <span id="cmTrackModeTag" class="text-amber-300 font-extrabold">T1</span>
+              <div class="flex items-center gap-0.5 bg-zinc-900 p-0.5 rounded-md border border-zinc-700" role="group" aria-label="Track playback mode">
+                <button type="button" data-track-playback="ONE_SHOT" class="cm-playback-btn px-1.5 py-0.5 rounded font-bold cursor-pointer">1-SHOT</button>
+                <button type="button" data-track-playback="GATE" class="cm-playback-btn px-1.5 py-0.5 rounded font-bold cursor-pointer">GATE</button>
+              </div>
+              <div class="flex items-center gap-0.5 bg-zinc-900 p-0.5 rounded-md border border-zinc-700" role="group" aria-label="Track voice mode">
+                <button type="button" data-track-voice="POLY" class="cm-voice-btn px-1.5 py-0.5 rounded font-bold cursor-pointer">POLY</button>
+                <button type="button" data-track-voice="MONO" class="cm-voice-btn px-1.5 py-0.5 rounded font-bold cursor-pointer">MONO</button>
+              </div>
+              <span title="Tape playback-rate pitch transposition anchored at C4 (MIDI 60). Real Stretch DSP is planned separately." class="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-700/80 text-[9px] text-zinc-400 font-bold">
+                TAPE · C4
+              </span>
+            </div>
+
+            <!-- Compact STRUM Slow-Fast Slider (Poly only; Mono 1/8 arp takes precedence) -->
+            <div id="cmStrumWrap" class="flex items-center gap-1.5">
+              <span class="text-[9px] text-zinc-400 font-bold">STRUM</span>
+              <span class="text-[8px] text-zinc-500">SLOW</span>
+              <input id="cmStrumSlider" type="range" min="0" max="100" step="1" value="73" aria-label="Strum speed slow to fast" class="cm-strum-slider w-20 sm:w-24 cursor-pointer" />
+              <span class="text-[8px] text-zinc-500">FAST</span>
+              <span id="cmStrumMsLabel" class="text-[9px] font-bold text-orange-300 w-10 text-right tabular-nums">55ms</span>
+            </div>
+          </div>
+
+          <!-- Approved 4 Modifiers ABOVE the 7 Chord Pads (Short tap latches · Long hold is momentary) -->
+          <div class="grid grid-cols-4 gap-2" role="group" aria-label="Chord modifiers">
+            <button type="button" data-mod="7TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-cyan-300 py-2 px-2 rounded-xl font-mono-tech text-xs font-extrabold flex items-center justify-between cursor-pointer border border-zinc-600">
+              <span>+7TH</span>
+              <span class="cm-mod-state text-[8px] px-1 rounded bg-black/40 text-zinc-500">OFF</span>
+            </button>
+            <button type="button" data-mod="SUS4" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-amber-300 py-2 px-2 rounded-xl font-mono-tech text-xs font-extrabold flex items-center justify-between cursor-pointer border border-zinc-600">
+              <span>SUS4</span>
+              <span class="cm-mod-state text-[8px] px-1 rounded bg-black/40 text-zinc-500">OFF</span>
+            </button>
+            <button type="button" data-mod="9TH" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-emerald-300 py-2 px-2 rounded-xl font-mono-tech text-xs font-extrabold flex items-center justify-between cursor-pointer border border-zinc-600">
+              <span>+9TH</span>
+              <span class="cm-mod-state text-[8px] px-1 rounded bg-black/40 text-zinc-500">OFF</span>
+            </button>
+            <button type="button" data-mod="STRUM" class="cm-mod-btn hw-btn bg-zinc-800 hover:bg-zinc-700 text-orange-300 py-2 px-2 rounded-xl font-mono-tech text-xs font-extrabold flex items-center justify-between cursor-pointer border border-zinc-600">
+              <span>STRUM</span>
+              <span class="cm-mod-state text-[8px] px-1 rounded bg-black/40 text-zinc-500">OFF</span>
+            </button>
+          </div>
+
+          <!-- Staggered 7-Button ChordMatiK Matrix: 3 Upper (ii, iii, vi) + 4 Lower (I, IV, V, vii°) -->
+          <div class="flex flex-col gap-3 my-auto py-1">
+            <!-- Upper Row (3 staggered dark keys) -->
+            <div class="grid grid-cols-3 gap-3 px-8 sm:px-12">
+              <button type="button" data-degree="1" class="chord-key-upper h-18 sm:h-20 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-1" class="text-base sm:text-lg font-display-jp font-bold leading-none">ii</span>
+                <span id="degLabel-1" class="text-xs font-mono-tech text-amber-300 mt-1">Dm</span>
+              </button>
+              <button type="button" data-degree="2" class="chord-key-upper h-18 sm:h-20 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-2" class="text-base sm:text-lg font-display-jp font-bold leading-none">iii</span>
+                <span id="degLabel-2" class="text-xs font-mono-tech text-amber-300 mt-1">Em</span>
+              </button>
+              <button type="button" data-degree="5" class="chord-key-upper h-18 sm:h-20 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-5" class="text-base sm:text-lg font-display-jp font-bold leading-none">vi</span>
+                <span id="degLabel-5" class="text-xs font-mono-tech text-amber-300 mt-1">Am</span>
+              </button>
+            </div>
+
+            <!-- Lower Row (4 primary cream keys) -->
+            <div class="grid grid-cols-4 gap-3">
+              <button type="button" data-degree="0" class="chord-key-lower h-20 sm:h-24 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-0" class="text-lg sm:text-xl font-display-jp font-black leading-none">I</span>
+                <span id="degLabel-0" class="text-xs font-mono-tech font-extrabold text-[#d93829] mt-1">C</span>
+              </button>
+              <button type="button" data-degree="3" class="chord-key-lower h-20 sm:h-24 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-3" class="text-lg sm:text-xl font-display-jp font-black leading-none">IV</span>
+                <span id="degLabel-3" class="text-xs font-mono-tech font-extrabold text-[#2f80ed] mt-1">F</span>
+              </button>
+              <button type="button" data-degree="4" class="chord-key-lower h-20 sm:h-24 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-4" class="text-lg sm:text-xl font-display-jp font-black leading-none">V</span>
+                <span id="degLabel-4" class="text-xs font-mono-tech font-extrabold text-[#27ae60] mt-1">G</span>
+              </button>
+              <button type="button" data-degree="6" class="chord-key-lower h-20 sm:h-24 rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                <span id="degRoman-6" class="text-lg sm:text-xl font-display-jp font-black leading-none">vii°</span>
+                <span id="degLabel-6" class="text-xs font-mono-tech font-extrabold text-zinc-700 mt-1">B°</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-1.5 border-t border-zinc-800 flex items-center justify-between gap-2 text-[10px] font-mono-tech text-zinc-400">
+            <span id="cmEngineStatus" class="truncate">TRK 1: UNASSIGNED (SILENT)</span>
+            <span id="cmVoicingReadout" class="text-amber-300 font-bold shrink-0">VOICING: C MAJ</span>
           </div>
         </div>
 
@@ -438,7 +477,7 @@
 
           <div class="mt-2 pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono-tech text-zinc-400">
             <span>EDITING: <strong id="seqContextLabel" class="text-white">SCN 01 // TRK 1</strong></span>
-            <span><span class="text-zinc-500">LEGACY SYNTH (PR04)</span> · TAP STEP OR <strong class="text-red-400">LIVE REC</strong></span>
+            <span><span class="text-zinc-500">LEGACY SYNTH (PR05)</span> · TAP STEP OR <strong class="text-red-400">LIVE REC</strong></span>
           </div>
         </div>
 

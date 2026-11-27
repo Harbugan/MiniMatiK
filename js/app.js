@@ -8,11 +8,17 @@
  */
 import { state, DECK_MODES } from './state.js';
 import { formatSlotNumber } from './soundbank-state.js';
-import { playClick } from './audio.js';
+import { playClick, sampleVoiceEngine, stopAllPerformanceAudio } from './audio.js';
 import { updateAllHUD, startPS1Display } from './display.js';
 import { initMutate, renderMutateConfigUI, setJoystickPosition } from './mutate.js';
 import { initSequencer, renderSequencerGrid, startTransport, stopTransport } from './sequencer.js';
-import { initChordMatiK, renderChordMatiKUI, triggerChordMatiKPad } from './chordmatik.js';
+import {
+  initChordMatiK,
+  renderChordMatiKUI,
+  triggerChordMatiKPad,
+  releaseChordMatiKKey,
+  releaseAllChordMatiKInputs
+} from './chordmatik.js';
 import {
   initSampler,
   renderSoundbankGrid,
@@ -87,12 +93,16 @@ export function renderTrackBar() {
     btn.addEventListener('click', () => {
       if (state.activeTrack === idx) {
         trk.muted = !trk.muted;
+        if (trk.muted) {
+          sampleVoiceEngine.stopTrack(idx);
+        }
         playClick(trk.muted ? 430 : 780);
       } else {
         state.activeTrack = idx;
         playClick(880);
       }
       renderTrackBar();
+      renderChordMatiKUI();
       renderSequencerGrid();
       if (state.samplerUI.overlayMode === 'acquire') {
         updateAcquireRoutingHint();
@@ -131,9 +141,12 @@ function bindGlobalControls() {
       : 'w-2 h-2 rounded-full bg-zinc-600';
     if (!state.audioEnabled) {
       stopSamplePreview();
+      stopAllPerformanceAudio();
+      releaseAllChordMatiKInputs();
     } else {
       playClick(1150);
     }
+    renderChordMatiKUI();
   });
 
   // Scene & BPM Controls
@@ -179,25 +192,38 @@ function bindGlobalControls() {
     if (e.key >= '1' && e.key <= '7') {
       const deg = Number(e.key) - 1;
       const el = document.querySelector(`[data-degree="${deg}"]`);
-      triggerChordMatiKPad(deg, el);
+      triggerChordMatiKPad(deg, el, { isKeyboard: true });
     } else if (e.code === 'Space') {
       e.preventDefault();
       state.isPlaying ? stopTransport() : startTransport();
     }
   });
 
-  // Ensure microphone tracks and audio preview are always released on page leave
-  window.addEventListener('pagehide', () => {
-    cleanupSamplerResources();
+  window.addEventListener('keyup', (e) => {
+    if (e.key >= '1' && e.key <= '7') {
+      const deg = Number(e.key) - 1;
+      releaseChordMatiKKey(deg);
+    }
   });
-  window.addEventListener('beforeunload', () => {
+
+  // Ensure microphone tracks, sample preview, and performance voices are always released on page leave
+  const handlePageUnload = () => {
     cleanupSamplerResources();
-  });
+    releaseAllChordMatiKInputs();
+    stopAllPerformanceAudio();
+  };
+  window.addEventListener('pagehide', handlePageUnload);
+  window.addEventListener('beforeunload', handlePageUnload);
 }
 
 function bootApp() {
   bindGlobalControls();
-  initSampler({ onTracksChanged: renderTrackBar });
+  initSampler({
+    onTracksChanged: () => {
+      renderTrackBar();
+      renderChordMatiKUI();
+    }
+  });
   initChordMatiK();
   initSequencer();
   initMutate({ onAutomationCleared: renderSequencerGrid });

@@ -14,6 +14,7 @@ import {
   countTrackAutoSteps
 } from './state.js';
 import { formatSlotNumber } from './soundbank-state.js';
+import { getScale } from './chordmatik-theory.js';
 
 const POLY_VERTS = [
   [0, 1.4, 0],
@@ -67,7 +68,8 @@ export function updateAllHUD() {
   if (modeName === 'SAMPLER') {
     document.getElementById('deckSubTag').textContent = loaded === 0 ? '00/19 EMPTY' : `${loadedStr}/19 SLOTS`;
   } else if (modeName === 'CHORDMATIK') {
-    document.getElementById('deckSubTag').textContent = `${state.chordmatik.subMode} // KEY ${ROOT_NOTES[state.chordmatik.rootIndex].name}`;
+    const scale = getScale(state.chordmatik.scaleMode);
+    document.getElementById('deckSubTag').textContent = `${state.chordmatik.subMode} // ${ROOT_NOTES[state.chordmatik.rootIndex].name} ${scale.shortLabel}`;
   } else if (modeName === 'SEQ') {
     document.getElementById('deckSubTag').textContent = `SCN ${sceneStr}/64`;
   } else {
