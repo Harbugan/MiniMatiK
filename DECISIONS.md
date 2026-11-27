@@ -22,11 +22,17 @@
 - **Hybrid track assignment (supersedes round 1 wording):** A newly acquired sample is automatically assigned to the currently active track **only if that track has no sample assignment**. If the active track already has an assignment, do not replace it automatically; the user must assign manually.
 - These decisions specify target behavior, not existing implementation.
 
+## Approved — Sampler design round 3 (2026-11-27)
+- **Playback modes:** Each sample supports selectable **One-shot** and **Gate** playback.
+- **Pitch/time modes:** Both **Tape** (pitch and playback speed change together) and **Stretch** (pitch changes while sample duration is preserved) are available.
+- **Voice modes:** Support both **Mono** and **Poly** playback, selectable per track.
+- These are target product requirements, not current prototype capabilities. Exact switching UI, gate note-off behavior, stretching algorithm, voice limits and voice stealing remain open.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
-- Non-destructive editing ranges and controls, pitch/time relationship, and sample playback modes.
-- Exact ChordMatiK modifier semantics and polyphony.
+- Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
+- Exact ChordMatiK modifier semantics, chord voicing, Mono/Poly voice limits and voice stealing.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
