@@ -10,7 +10,7 @@ Status legend: PLANNED / IN PROGRESS / QA / DONE. No implementation is approved 
 - **PR03 — Modular Foundation:** Extract HTML/CSS/JS into maintainable modules and update NordicWay FTPS deployment for multi-file assets. **DONE — merged to main; user reports physical QA passed.** Contract: `TASKS/PR03-MODULAR-FOUNDATION.md`.
 - **PR02 — Soundbank:** Import audio files and record microphone input into 19 initially empty slots; preview, clear, and assign samples to seven tracks. **DONE — merged to main (PR #1); user reports testing completed.**
 - **PR04 — ChordMatiK Audio Engine:** Real assigned-sample performance, diatonic chords/modifiers, Smart Chord Priority, Gate/One-shot and 8-voice management. **QA — IMPLEMENTED ON FEATURE BRANCH; PENDING PHYSICAL IPAD QA & OWNER APPROVAL.** Contract: `TASKS/PR04-CHORDMATIK-AUDIO-ENGINE.md`.
-- **PR05 — Sequencer:** Audio-clock-backed 16-step playback, live recording, seven tracks, and 64 scenes. **PLANNED**
+- **PR05 — Sequencer:** Audio-clock-backed 16-step sample playback, Q ON/OFF live recording, multiple events, overdub, duration-aware notes, next-bar scenes and whole-scene copy. **PLANNED — DESIGN APPROVED; CONTRACT READY; NOT IMPLEMENTED.** Contract: `TASKS/PR05-REAL-SEQUENCER.md`.
 
 ## Phase 3 — Mutate
 - **PR06 — DSP and automation:** Map X/Y to real-time effects; record and replay movement; clear automation per track/scene. **PLANNED**
@@ -55,3 +55,9 @@ See DECISIONS.md. PR numbering is provisional and may be refined before each con
 - **Dependencies and ordering:** Do not delay PR05 for Sample Editing. Plan Sample Editing after PR05 and before final persistence/polish; adjust later PR numbering only through a separate explicit decision, preserving existing PR06 Mutate and PR07 Persistence labels until then.
 - **Out of scope now:** No sample-editor implementation, sequencer implementation, automatic PR renumbering or merges authorized by this documentation change.
 - **PR04 physical QA:** Owner reports five PASS results for Smart Switching, Modifiers/STRUM, Mono Arpeggio, One-shot/Gate and Multi-touch. PR04 is already merged; this records reported musical QA without claiming every regression check was performed.
+
+## PR05 Real Sequencer design checkpoint — 2026-11-28
+- **Design approved; implementation not started.** Q ON/OFF; Tap + Note Detail; next-bar scene switching; continuous overdub; multiple note events per step; recorded note duration; entire-scene copy to chosen destination.
+- **Contract ready for review:** `TASKS/PR05-REAL-SEQUENCER.md`. The implementation must replace SEQ-16 legacy oscillator and setInterval timing with user-sample playback and a Web Audio-clock scheduler while retaining PR04 behavior and existing step automation.
+- **Explicit exclusions:** Song arrangement/chaining, sample editing (planned after PR05), Mutate DSP and project persistence. Do not renumber PR06/PR07.
+- **Release gate:** Separate owner authorization before Antigravity implementation, physical iPad QA and explicit merge approval.
