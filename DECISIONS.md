@@ -58,11 +58,17 @@
 - STRUM means chord notes are triggered sequentially with a short offset, creating a strummed feel; precise timing, direction, and interaction with Mono arpeggio remain open.
 - These are product-design decisions; the current HTML has not yet been updated.
 
+## Approved — ChordMatiK STRUM behavior (2026-11-27)
+- **STRUM option A:** Use one fixed, musical strum speed.
+- STRUM staggers the chord-note attacks by a short, consistent interval; there is no user-facing Slow/Fast control and no requirement to sync the interval to BPM.
+- The exact interval in milliseconds is an implementation tuning parameter requiring musical QA, not an additional user-facing setting.
+- STRUM direction, overlap with 7TH/SUS4/9TH, and interaction with Mono arpeggio are not yet approved.
+
 ## Open — requires explicit decision
 - Explicit manual sample-to-track assignment interaction; whether a loaded sample selected for preview changes the active track.
 - Record/import UX details, microphone monitoring, supported file formats, sample limits and preview.
 - Non-destructive editing ranges and controls; default One-shot/Gate and Tape/Stretch modes, Gate note-off and looping behavior, time-stretch quality, and performance constraints.
-- ChordMatiK seven-button degree-to-pad mapping; scale-selector UX, chord voicing, STRUM timing/direction, modifier combinations and Mono arpeggio interaction, Poly voice limits and voice stealing.
+- ChordMatiK seven-button degree-to-pad mapping; scale-selector UX, chord voicing, STRUM direction, modifier combinations and Mono arpeggio interaction, Poly voice limits and voice stealing.
 - Scene transition, chaining, song mode, and scene copy rules.
 - X/Y parameter mappings, per-track vs global effect scope, automation granularity and overwrite rules.
 - Local project format, storage quota, export/import behavior.
