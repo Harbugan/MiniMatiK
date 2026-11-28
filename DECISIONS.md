@@ -133,3 +133,13 @@ The supplied HTML fills empty slots with predefined labels and plays oscillators
 - **Sample Editing remains committed product scope** in a dedicated post-PR05 work item, with PR identifier to be assigned during planning. Approved capabilities: non-destructive TRIM, PITCH, VOLUME and REVERSE; preserve original user audio and allow edits to be revised/reset.
 - Waveform presentation, trim handles, editing ranges, preview behavior, parameter storage, and interaction with playback require a separate UX/design round before an Antigravity implementation contract. No new editor UX details are approved by this scheduling decision.
 - Documentation planning is authorized; implementation and merge are not.
+
+## Approved — PR05 Real Sequencer design (2026-11-28)
+- **Live REC quantization:** Q ON/OFF. Q ON quantizes newly recorded note onsets to the nearest 16th step; Q OFF preserves performed timing. Changing Q does not rewrite existing notes.
+- **Step editing:** Keep the 16-step grid primary; tapping steps supports simple editing and a Note Detail view for inspecting/editing event notes and timing. Multi-event steps must not silently lose events.
+- **Scene switching:** While transport runs, queue the selected scene for the **next bar boundary**; clearly show current and queued scene. Stopped scene selection is immediate.
+- **Recording mode:** Continuous **Overdub**, including across the step 16-to-1 loop boundary. Preserve existing notes and add new events.
+- **Event model:** Allow multiple independent note events per step, including repeated notes and chords, preserving absolute MIDI pitches and per-event onset timing offsets.
+- **Duration:** Record note-on and note-off to preserve actual note length; Gate playback follows recorded hold duration, One-shot retains natural sample-end semantics subject to voice rules.
+- **Scene Copy:** Copy the **entire scene**, including all seven tracks, note events, and existing automation, to a selected destination. Prevent accidental overwrites.
+- **Scope:** PR05 replaces legacy SEQ-16 oscillator and setInterval scheduling with user-sample audio-clock playback. Song arrangement/chaining, continuous Mutate DSP automation, Sample Editing and persistence remain separate. Implementation requires a separate authorization; contract: `TASKS/PR05-REAL-SEQUENCER.md`.

@@ -86,3 +86,11 @@ No feature expansion, audio architecture rewrite, or redesign until explicitly a
 
 ### Sample Editing delivery placement — approved 2026-11-28
 Sample Editing is a **dedicated planned work item after PR05 Sequencer**, not part of PR05. Keep all four approved non-destructive operations (TRIM, PITCH, VOLUME, REVERSE) and retain original sample data. Specific waveform UI, touch editing behavior, parameter ranges, and preview integration remain design decisions to be made before implementation. See ROADMAP.md; no editor has been implemented by this documentation update.
+
+### PR05 Real Sequencer — approved design (2026-11-28)
+- Seven tracks x 16 steps x up to 64 scenes, sample-only playback using each track's assigned user sound; audio-clock timing, no legacy oscillator fallback.
+- Live REC: **Q ON/OFF** (nearest 16th-step onset vs preserved performed timing), **continuous Overdub** across loop boundaries, multiple note events per step with absolute pitches, individual timing offsets and recorded note durations.
+- Step UX: **Tap + Note Detail**; edit individual events without flattening a multi-event step. Preserve a simple 16-step overview on iPad.
+- Scenes: queue changes at the **next bar** during playback; stopped selection is immediate. **Copy Entire Scene** to a selected destination, preserving all seven tracks, notes and existing automation with overwrite protection.
+- Gate uses recorded duration and One-shot plays to sample end subject to existing voice limits; preserve PR04 chord behavior and existing X/Y step automation.
+- No song arrangement, scene chaining, new Mutate DSP, sample editor, or persistence in PR05. See `TASKS/PR05-REAL-SEQUENCER.md`.

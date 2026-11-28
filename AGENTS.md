@@ -20,3 +20,8 @@ Read README.md, PRODUCT-SPEC.md, DESIGN-SYSTEM.md, DECISIONS.md, ARCHITECTURE.md
 
 ## Delivery contract
 One focused PR at a time. Provide changes, tests performed, known limitations, physical iPad QA checklist, and any required documentation updates. Wait for product-owner acceptance before merging. Keep documentation aligned with verified implementation, not aspirations.
+
+## PR05-specific handoff
+- Approved PR05 decisions and technical boundaries are documented in `DECISIONS.md`, `PRODUCT-SPEC.md`, `ARCHITECTURE.md`, and `TASKS/PR05-REAL-SEQUENCER.md`. Treat the contract as ready for review, not implementation authorization.
+- PR05 replaces SEQ-16 legacy oscillator/setInterval playback with sample-based Web Audio-clock scheduling, while preserving PR04 ChordMatiK and existing sample routing. Do not expand into song arrangement, sample editing, Mutate DSP or persistence.
+- Wait for explicit owner instruction before implementing; preserve owner physical iPad QA and no-auto-merge gates.
