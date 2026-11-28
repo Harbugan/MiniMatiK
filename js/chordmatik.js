@@ -21,7 +21,7 @@ import {
 } from './chordmatik-theory.js';
 import { playClick, sampleVoiceEngine } from './audio.js';
 import { updateAllHUD, showChordCallout } from './display.js';
-import { renderSequencerGrid } from './sequencer.js';
+import { renderSequencerGrid, recordLiveNoteOn, recordLiveNoteOff } from './sequencer.js';
 
 // Active pointer and keyboard ownership maps (ensures clean Gate release across track switches)
 const activePadPointers = new Map(); // pointerId -> { trackIndex, groupId, el, degreeIdx }
@@ -231,35 +231,43 @@ export function triggerChordMatiKPad(degreeIdx, el = null, { pointerId = null, i
     trackMuted: Boolean(trk && trk.muted)
   });
 
-  // Track ownership for Gate release even if activeTrack changes before release
+  const recKey = pointerId !== null
+    ? `ptr:${pointerId}`
+    : (isKeyboard ? `key:${degreeIdx}` : null);
+
+  // Track ownership for Gate release and live REC note-off duration capture
   if (result.triggered && result.groupId !== null) {
     if (pointerId !== null) {
       activePadPointers.set(pointerId, {
         trackIndex,
         groupId: result.groupId,
         el,
-        degreeIdx
+        degreeIdx,
+        recKey
       });
     } else if (isKeyboard) {
       activeKeyPresses.set(degreeIdx, {
         trackIndex,
         groupId: result.groupId,
-        el
+        el,
+        recKey
       });
     }
-  } else if (pointerId !== null && el) {
-    // Still track visual release for silent/unassigned pads
+  } else if (pointerId !== null) {
+    // Still track visual release and REC note-off for silent/unassigned pads
     activePadPointers.set(pointerId, {
       trackIndex,
       groupId: null,
       el,
-      degreeIdx
+      degreeIdx,
+      recKey
     });
-  } else if (isKeyboard && el) {
+  } else if (isKeyboard) {
     activeKeyPresses.set(degreeIdx, {
       trackIndex,
       groupId: null,
-      el
+      el,
+      recKey
     });
   }
 
@@ -278,11 +286,16 @@ export function triggerChordMatiKPad(degreeIdx, el = null, { pointerId = null, i
   }
   showChordCallout(calloutText);
 
-  // Live Record stores exact absolute triggered MIDI pitches (unaffected by later KEY/SCALE changes)
+  // PR05 Live Overdub: records one event per pad trigger with exact absolute MIDI pitches
+  // (never duplicates STRUM/arp internal notes; unaffected by subsequent KEY/SCALE changes).
   if (state.isRecording) {
-    const stepObj = state.scenes[state.currentScene][trackIndex][state.currentStep];
-    stepObj.active = true;
-    stepObj.midiNotes = [...triggerData.midiNotes];
+    recordLiveNoteOn(recKey, {
+      trackIndex,
+      midiNotes: triggerData.midiNotes,
+      isChordGroup: triggerData.isChordGroup,
+      strumEnabled: Boolean(activeMods.STRUM),
+      strumMs: state.chordmatik.strumMs
+    });
     renderSequencerGrid();
   }
 
@@ -305,6 +318,9 @@ export function releaseChordMatiKPointer(pointerId) {
   if (!rec) return false;
   activePadPointers.delete(pointerId);
 
+  if (rec.recKey) {
+    recordLiveNoteOff(rec.recKey);
+  }
   if (rec.groupId !== null) {
     sampleVoiceEngine.releasePerformance(rec.trackIndex, rec.groupId);
   }
@@ -319,6 +335,9 @@ export function releaseChordMatiKKey(degreeIdx) {
   if (!rec) return false;
   activeKeyPresses.delete(degreeIdx);
 
+  if (rec.recKey) {
+    recordLiveNoteOff(rec.recKey);
+  }
   if (rec.groupId !== null) {
     sampleVoiceEngine.releasePerformance(rec.trackIndex, rec.groupId);
   }

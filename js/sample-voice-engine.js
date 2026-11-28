@@ -175,26 +175,40 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     safeStopSource(voice.source, safeEnd);
   }
 
-  function cancelGroupPending(pool, group, now) {
-    group.pendingEvents.length = 0;
-    group.arpLoop = false;
-    group.awaitingResume = false;
+  function cancelGroupPending(pool, group, cutoffTime, now) {
+    const tNow = Number.isFinite(now) ? now : cutoffTime;
+    if (cutoffTime > tNow) {
+      group.pendingEvents = group.pendingEvents.filter(ev => ev.dueTime < cutoffTime);
+      if (group.arpLoop) {
+        group.arpStopTime = group.arpStopTime !== null ? Math.min(group.arpStopTime, cutoffTime) : cutoffTime;
+        if (group.arpNextTime >= cutoffTime) {
+          group.arpLoop = false;
+        }
+      }
+    } else {
+      group.pendingEvents.length = 0;
+      group.arpLoop = false;
+      group.awaitingResume = false;
+    }
 
-    // Cancel any lookahead voices belonging to this group that have not started yet
-    const unstarted = pool.voices.filter(v => !v.ended && v.groupId === group.id && v.startTime > now);
+    // Cancel any lookahead voices belonging to this group that start at/after cutoffTime (and haven't started yet)
+    const unstarted = pool.voices.filter(
+      v => !v.ended && v.groupId === group.id && v.startTime > tNow && v.startTime >= cutoffTime
+    );
     for (const v of unstarted) {
-      cancelUnstartedVoice(pool, v, now);
+      cancelUnstartedVoice(pool, v, tNow);
     }
   }
 
-  function fadeOutGroup(pool, group, now, fadeSec) {
-    cancelGroupPending(pool, group, now);
+  function fadeOutGroup(pool, group, fadeStart, fadeSec, now) {
+    const tNow = Number.isFinite(now) ? now : fadeStart;
+    cancelGroupPending(pool, group, fadeStart, tNow);
     const active = pool.voices.filter(v => !v.ended && v.groupId === group.id);
     for (const v of active) {
-      if (v.startTime > now) {
-        cancelUnstartedVoice(pool, v, now);
-      } else {
-        fadeAndStopVoice(v, now, now + fadeSec);
+      if (v.startTime > tNow && v.startTime >= fadeStart) {
+        cancelUnstartedVoice(pool, v, tNow);
+      } else if (v.endTime > fadeStart) {
+        fadeAndStopVoice(v, fadeStart, fadeStart + fadeSec);
       }
     }
     pruneFinishedGroups(pool);
@@ -208,11 +222,13 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     trackIndex,
     groupId,
     isChordGroup,
+    sourceTag = 'live',
     buffer,
     midi,
     desiredStartTime,
     targetGain,
-    voiceMode
+    voiceMode,
+    gateReleaseTime = null
   }) {
     const now = ctx.currentTime;
     pruneTrackVoices(pool, now);
@@ -232,7 +248,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
       }
 
       const victim = overlapping[0];
-      if (victim.startTime > now) {
+      if (victim.startTime > now && victim.startTime >= startTime) {
         cancelUnstartedVoice(pool, victim, now);
         continue;
       }
@@ -242,7 +258,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
         // Victim is already stopping within a few ms — wait until its exact stop time
         startTime = Math.max(startTime, victim.endTime);
       } else {
-        const fadeStart = Math.max(now, startTime - STEAL_FADE_SEC);
+        const fadeStart = Math.max(now, victim.startTime, startTime - STEAL_FADE_SEC);
         const fadeEnd = fadeStart + STEAL_FADE_SEC;
         fadeAndStopVoice(victim, fadeStart, fadeEnd);
         startTime = Math.max(startTime, fadeEnd);
@@ -280,6 +296,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
       trackIndex,
       groupId,
       isChordGroup,
+      sourceTag,
       midi,
       playbackRate,
       source,
@@ -305,7 +322,15 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     };
 
     source.start(startTime);
-    onAudioActivity({ trackIndex, midi, startTime, playbackRate });
+
+    if (Number.isFinite(gateReleaseTime)) {
+      const relStart = Math.max(startTime + 0.002, gateReleaseTime);
+      if (relStart < naturalEndTime) {
+        fadeAndStopVoice(voice, relStart, relStart + GATE_RELEASE_SEC);
+      }
+    }
+
+    onAudioActivity({ trackIndex, midi, startTime, playbackRate, sourceTag });
     return voice;
   }
 
@@ -355,15 +380,20 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
         // 1. Drain fixed pending events (STRUM notes & One-shot Mono arp steps)
         while (group.pendingEvents.length > 0 && group.pendingEvents[0].dueTime <= horizon) {
           const ev = group.pendingEvents.shift();
+          if (group.gateReleaseTime !== null && ev.dueTime >= group.gateReleaseTime) {
+            continue;
+          }
           spawnVoice(ctx, pool, {
             trackIndex: group.trackIndex,
             groupId: group.id,
             isChordGroup: group.isChordGroup,
+            sourceTag: group.sourceTag,
             buffer: group.buffer,
             midi: ev.midi,
             desiredStartTime: Math.max(now, ev.dueTime),
             targetGain: group.noteGain,
-            voiceMode: group.voiceMode
+            voiceMode: group.voiceMode,
+            gateReleaseTime: group.gateReleaseTime
           });
         }
 
@@ -371,6 +401,10 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
         if (group.arpLoop && group.midiNotes.length > 0) {
           let safety = 0;
           while (group.arpNextTime <= horizon && safety++ < 8) {
+            if (group.arpStopTime !== null && group.arpNextTime >= group.arpStopTime) {
+              group.arpLoop = false;
+              break;
+            }
             const midi = group.midiNotes[group.arpNextIndex];
             const stepSec = getEighthNoteDurationSec(getBpm());
             const scheduledTime = Math.max(now, group.arpNextTime);
@@ -378,11 +412,13 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
               trackIndex: group.trackIndex,
               groupId: group.id,
               isChordGroup: group.isChordGroup,
+              sourceTag: group.sourceTag,
               buffer: group.buffer,
               midi,
               desiredStartTime: scheduledTime,
               targetGain: group.noteGain,
-              voiceMode: 'MONO'
+              voiceMode: 'MONO',
+              gateReleaseTime: group.gateReleaseTime
             });
             group.arpNextIndex = (group.arpNextIndex + 1) % group.midiNotes.length;
             group.arpNextTime = spawned.startTime + stepSec;
@@ -414,6 +450,15 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     group.starting = true;
     try {
       const now = ctx.currentTime;
+      const baseStart = Number.isFinite(group.desiredStartTime) ? Math.max(now, group.desiredStartTime) : now;
+      const gateReleaseTime = (group.playbackMode === 'GATE' && Number.isFinite(group.durationSec) && group.durationSec > 0)
+        ? baseStart + group.durationSec
+        : null;
+      group.gateReleaseTime = gateReleaseTime;
+      if (gateReleaseTime !== null) {
+        group.arpStopTime = gateReleaseTime;
+      }
+
       const notes = group.midiNotes;
       const isMonoChord = group.isChordGroup && group.voiceMode === 'MONO';
       const isPolyStrum = group.isChordGroup && group.voiceMode === 'POLY' && group.strumEnabled && notes.length > 1;
@@ -425,17 +470,22 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
           trackIndex: group.trackIndex,
           groupId: group.id,
           isChordGroup: true,
+          sourceTag: group.sourceTag,
           buffer: group.buffer,
           midi: notes[0],
-          desiredStartTime: now,
+          desiredStartTime: baseStart,
           targetGain: group.noteGain,
-          voiceMode: 'MONO'
+          voiceMode: 'MONO',
+          gateReleaseTime
         });
 
         if (group.playbackMode === 'GATE') {
-          group.arpLoop = true;
-          group.arpNextIndex = notes.length > 1 ? 1 : 0;
-          group.arpNextTime = firstVoice.startTime + stepSec;
+          const nextArp = firstVoice.startTime + stepSec;
+          if (gateReleaseTime === null || nextArp < gateReleaseTime) {
+            group.arpLoop = true;
+            group.arpNextIndex = notes.length > 1 ? 1 : 0;
+            group.arpNextTime = nextArp;
+          }
         } else {
           // One-shot Mono arp plays one complete ascending pass through the chord tones
           for (let i = 1; i < notes.length; i++) {
@@ -454,21 +504,25 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
         const clampedStrumMs = Math.max(STRUM_MIN_MS, Math.min(STRUM_MAX_MS, Number(group.strumMs) || STRUM_DEFAULT_MS));
         const spacingSec = clampedStrumMs / 1000;
 
-        // Trigger lowest note immediately, schedule remaining ascending notes on Web Audio clock
+        // Trigger lowest note at baseStart, schedule remaining ascending notes on Web Audio clock
         const firstVoice = spawnVoice(ctx, pool, {
           trackIndex: group.trackIndex,
           groupId: group.id,
           isChordGroup: true,
+          sourceTag: group.sourceTag,
           buffer: group.buffer,
           midi: notes[0],
-          desiredStartTime: now,
+          desiredStartTime: baseStart,
           targetGain: group.noteGain,
-          voiceMode: 'POLY'
+          voiceMode: 'POLY',
+          gateReleaseTime
         });
 
         for (let i = 1; i < notes.length; i++) {
+          const dueTime = firstVoice.startTime + i * spacingSec;
+          if (gateReleaseTime !== null && dueTime >= gateReleaseTime) break;
           group.pendingEvents.push({
-            dueTime: firstVoice.startTime + i * spacingSec,
+            dueTime,
             midi: notes[i],
             noteIndex: i
           });
@@ -484,11 +538,13 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
           trackIndex: group.trackIndex,
           groupId: group.id,
           isChordGroup: group.isChordGroup,
+          sourceTag: group.sourceTag,
           buffer: group.buffer,
           midi: notes[i],
-          desiredStartTime: now,
+          desiredStartTime: baseStart,
           targetGain: group.noteGain,
-          voiceMode: group.voiceMode
+          voiceMode: group.voiceMode,
+          gateReleaseTime
         });
         if (!firstSpawned) firstSpawned = v;
       }
@@ -499,7 +555,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
   }
 
   /**
-   * Triggers a ChordMatiK pad performance using a real user AudioBuffer.
+   * Triggers a live ChordMatiK pad or scheduled PR05 sequencer event using a real user AudioBuffer.
    * Returns { triggered, groupId, reason }.
    */
   function triggerPerformance({
@@ -511,7 +567,10 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     voiceMode = 'POLY',
     strumEnabled = false,
     strumMs = STRUM_DEFAULT_MS,
-    trackMuted = false
+    trackMuted = false,
+    startTime = null,
+    durationSec = null,
+    source = 'live'
   } = {}) {
     if (!isAudioEnabled()) {
       return { triggered: false, groupId: null, reason: 'AUDIO_DISABLED' };
@@ -554,6 +613,8 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
 
     const normalizedPlayback = playbackMode === 'GATE' ? 'GATE' : 'ONE_SHOT';
     const normalizedVoice = voiceMode === 'MONO' ? 'MONO' : 'POLY';
+    const desiredStartTime = Number.isFinite(startTime) ? Math.max(now, startTime) : now;
+    const sourceTag = source === 'sequencer' ? 'sequencer' : 'live';
 
     // Smart Chord Priority (Option A):
     // A newly pressed CHORD group supersedes the previous CHORD group on this track
@@ -562,13 +623,15 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
     if (isChordGroup && pool.activeChordGroupId !== null) {
       const prevGroup = pool.groups.get(pool.activeChordGroupId);
       if (prevGroup) {
-        prevGroup.superseded = true;
-        prevGroup.cancelled = true;
+        if (desiredStartTime <= now) {
+          prevGroup.superseded = true;
+          prevGroup.cancelled = true;
+        }
         if (normalizedVoice === 'MONO') {
-          // Cancel pending attacks; Mono 1-voice spawn handles fade-to-zero before new attack
-          cancelGroupPending(pool, prevGroup, now);
+          // Cancel pending attacks at/after switch time; Mono 1-voice spawn handles fade-to-zero
+          cancelGroupPending(pool, prevGroup, desiredStartTime, now);
         } else {
-          fadeOutGroup(pool, prevGroup, now, CHORD_CROSSFADE_SEC);
+          fadeOutGroup(pool, prevGroup, desiredStartTime, CHORD_CROSSFADE_SEC, now);
         }
       }
       pool.activeChordGroupId = null;
@@ -576,8 +639,10 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
       // In Mono mode, even NOTE/DRUM triggers cancel any active pending arp on this track
       for (const existing of pool.groups.values()) {
         if (!existing.cancelled && (existing.pendingEvents.length > 0 || existing.arpLoop)) {
-          existing.cancelled = true;
-          cancelGroupPending(pool, existing, now);
+          if (desiredStartTime <= now) {
+            existing.cancelled = true;
+          }
+          cancelGroupPending(pool, existing, desiredStartTime, now);
         }
       }
     }
@@ -589,6 +654,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
       id: nextGroupId++,
       trackIndex,
       isChordGroup: Boolean(isChordGroup),
+      sourceTag,
       playbackMode: normalizedPlayback,
       voiceMode: normalizedVoice,
       strumEnabled: Boolean(strumEnabled),
@@ -596,6 +662,10 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
       buffer,
       midiNotes: sortedNotes,
       noteGain,
+      desiredStartTime,
+      durationSec: Number.isFinite(durationSec) && durationSec > 0 ? durationSec : null,
+      gateReleaseTime: null,
+      arpStopTime: null,
       pendingEvents: [],
       arpLoop: false,
       arpNextIndex: 0,
@@ -725,6 +795,51 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
   }
 
   /**
+   * Cancels future unstarted voices and pending STRUM/arp attacks at or after `fromTime`
+   * without cancelling already sounding One-shots or already started Gate voices.
+   * Used by PR05 scene switches and live BPM re-anchoring.
+   */
+  function cancelFutureVoices(fromTime, { source = 'sequencer', trackIndex = null } = {}) {
+    const ctx = getExistingContext();
+    const now = ctx ? (ctx.currentTime || 0) : 0;
+    const cutoff = Number.isFinite(fromTime) ? Math.max(now, fromTime) : now;
+    const startTrack = isValidTrack(trackIndex) ? trackIndex : 0;
+    const endTrack = isValidTrack(trackIndex) ? trackIndex : TRACK_COUNT - 1;
+
+    let cancelledCount = 0;
+
+    for (let t = startTrack; t <= endTrack; t++) {
+      const pool = trackPools[t];
+      for (const group of pool.groups.values()) {
+        if (source && group.sourceTag !== source) continue;
+        const beforePending = group.pendingEvents.length;
+        group.pendingEvents = group.pendingEvents.filter(ev => ev.dueTime < cutoff);
+        cancelledCount += beforePending - group.pendingEvents.length;
+
+        if (group.arpLoop) {
+          group.arpStopTime = group.arpStopTime !== null ? Math.min(group.arpStopTime, cutoff) : cutoff;
+          if (group.arpNextTime >= cutoff) {
+            group.arpLoop = false;
+          }
+        }
+      }
+
+      const unstarted = pool.voices.filter(
+        v => !v.ended && (!source || v.sourceTag === source) && v.startTime > now && v.startTime >= cutoff
+      );
+      for (const v of unstarted) {
+        cancelUnstartedVoice(pool, v, now);
+        cancelledCount++;
+      }
+
+      pruneFinishedGroups(pool);
+    }
+
+    stopSchedulerIfIdle();
+    return cancelledCount;
+  }
+
+  /**
    * Stops all active voices and pending attacks across all 7 tracks (global stop / audio off / unload).
    */
   function stopAll(fadeSec = GATE_RELEASE_SEC) {
@@ -761,6 +876,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
         id: v.id,
         groupId: v.groupId,
         isChordGroup: v.isChordGroup,
+        sourceTag: v.sourceTag,
         midi: v.midi,
         playbackRate: v.playbackRate,
         startTime: v.startTime,
@@ -785,6 +901,7 @@ export function createSampleVoiceEngine(audioContextManager, options = {}) {
   return {
     triggerPerformance,
     releasePerformance,
+    cancelFutureVoices,
     stopTrack,
     stopAll,
     enforceVoiceMode,

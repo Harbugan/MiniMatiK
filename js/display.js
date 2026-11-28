@@ -58,6 +58,7 @@ export function updateAllHUD() {
   const loaded = getLoadedCount();
   const loadedStr = String(loaded).padStart(2, '0');
   const sceneStr = String(state.currentScene + 1).padStart(2, '0');
+  const queuedStr = state.queuedScene !== null ? String(state.queuedScene + 1).padStart(2, '0') : null;
   const trk = state.tracks[state.activeTrack];
   const autoCount = countTrackAutoSteps(state.currentScene, state.activeTrack);
 
@@ -71,13 +72,22 @@ export function updateAllHUD() {
     const scale = getScale(state.chordmatik.scaleMode);
     document.getElementById('deckSubTag').textContent = `${state.chordmatik.subMode} // ${ROOT_NOTES[state.chordmatik.rootIndex].name} ${scale.shortLabel}`;
   } else if (modeName === 'SEQ') {
-    document.getElementById('deckSubTag').textContent = `SCN ${sceneStr}/64`;
+    document.getElementById('deckSubTag').textContent = queuedStr ? `SCN ${sceneStr}→${queuedStr}` : `SCN ${sceneStr}/64`;
   } else {
     document.getElementById('deckSubTag').textContent = `AUTO ${autoCount}/16`;
   }
 
   document.getElementById('headerSceneDisplay').textContent = `${sceneStr}/64`;
-  document.getElementById('hudSceneLabel').textContent = `SCN ${sceneStr}/64`;
+  const queuedBadge = document.getElementById('headerSceneQueued');
+  if (queuedBadge) {
+    if (queuedStr) {
+      queuedBadge.textContent = `→${queuedStr}`;
+      queuedBadge.classList.remove('hidden');
+    } else {
+      queuedBadge.classList.add('hidden');
+    }
+  }
+  document.getElementById('hudSceneLabel').textContent = queuedStr ? `SCN ${sceneStr} → ${queuedStr}` : `SCN ${sceneStr}/64`;
   document.getElementById('headerBpmDisplay').textContent = state.bpm;
   document.getElementById('headerBankPill').textContent = `BANK ${loadedStr}/19`;
 
@@ -94,7 +104,9 @@ export function updateAllHUD() {
   document.getElementById('routingSummaryText').textContent =
     `BANK[${loadedStr}/19] → TRK ${trk.id} [${slotTag}]`;
 
-  document.getElementById('seqContextLabel').textContent = `SCN ${sceneStr} // TRK ${trk.id}`;
+  document.getElementById('seqContextLabel').textContent = queuedStr
+    ? `SCN ${sceneStr}→${queuedStr} // TRK ${trk.id}`
+    : `SCN ${sceneStr} // TRK ${trk.id}`;
   document.getElementById('autoStepCountLabel').textContent = `AUTO STEPS: ${autoCount}/16`;
 
   // Automation status badge on PS1 screen + Joystick ring

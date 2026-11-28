@@ -14,6 +14,7 @@ import {
   NOTE_NAMES,
   STRUM_DEFAULT_MS
 } from './chordmatik-theory.js';
+import { createInitialScenes } from './sequencer-model.js';
 
 export const DECK_MODES = ['SAMPLER', 'CHORDMATIK', 'SEQ', 'MUTATE'];
 
@@ -34,21 +35,7 @@ export const MODE_DISPLAY_LABELS = {
 // All 12 chromatic keys (C through B)
 export const ROOT_NOTES = CHROMATIC_ROOTS;
 
-export { NOTE_NAMES };
-
-export function createInitialScenes() {
-  // 64 Scenes x 7 Tracks x 16 Steps (each step stores trigger + absolute midiNotes + recorded X/Y automation)
-  return Array.from({ length: 64 }, () =>
-    Array.from({ length: 7 }, () =>
-      Array.from({ length: 16 }, () => ({
-        active: false,
-        midiNotes: null,
-        autoX: null, // -1..1 when recorded
-        autoY: null  // -1..1 when recorded
-      }))
-    )
-  );
-}
+export { NOTE_NAMES, createInitialScenes };
 
 export function createInitialState() {
   return {
@@ -56,10 +43,12 @@ export function createInitialState() {
     audioEnabled: true,
     isPlaying: false,
     isRecording: false,
+    quantizeEnabled: true, // Q ON (nearest 16th) / Q OFF (preserved microtiming)
     bpm: 120,
     currentStep: 0,
     activeTrack: 0, // 0..6 (TRK 1..7)
     currentScene: 0, // 0..63 (SCN 01..64)
+    queuedScene: null, // null | 0..63 (next-bar queued scene while playing)
     selectedSlot: 0, // 0..18 (Slot 01..19)
 
     // 19 Soundbank slots — starts genuinely empty at 00/19 (no factory samples)
@@ -79,6 +68,15 @@ export function createInitialState() {
       recordElapsedMs: 0,
       feedbackText: 'TAP EMPTY SLOT TO RECORD OR IMPORT · SELECT LOADED TO PREVIEW OR ASSIGN',
       feedbackTone: 'neutral' // 'neutral' | 'success' | 'warn' | 'error'
+    },
+
+    // Sequencer PR05 UI state
+    sequencerUI: {
+      selectedStep: 0,
+      detailOpen: false,
+      copyOverlayOpen: false,
+      copyDestScene: 1,
+      feedbackText: 'TAP STEP TO TOGGLE · MULTI-EVENT OR DETAIL TO EDIT · REC OVERDUBS'
     },
 
     scenes: createInitialScenes(),
@@ -110,8 +108,7 @@ export function createInitialState() {
     },
 
     visualPulse: 0,
-    chordCalloutTimer: null,
-    stepTimer: null
+    chordCalloutTimer: null
   };
 }
 

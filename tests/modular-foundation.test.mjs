@@ -92,13 +92,22 @@ test('entry point moved to index.html and all local CSS/JS references exist', ()
 test('ES module dependency graph under js/ has valid imports and zero circular dependencies', () => {
   const jsDir = path.join(REPO_ROOT, 'js');
   const jsFiles = listFiles(jsDir, '.js');
-  assert.equal(jsFiles.length, 14, 'Expected 14 ES modules under js/ (12 PR03 + 2 PR04)');
+  assert.equal(jsFiles.length, 16, 'Expected 16 ES modules under js/ (12 PR03 + 2 PR04 + 2 PR05)');
 
   const cmSource = fs.readFileSync(path.join(jsDir, 'chordmatik.js'), 'utf8');
   assert.doesNotMatch(cmSource, /playMutatedVoice|createOscillator/, 'ChordMatiK must never use legacy oscillator playback');
 
   const voiceEngineSource = fs.readFileSync(path.join(jsDir, 'sample-voice-engine.js'), 'utf8');
   assert.doesNotMatch(voiceEngineSource, /createOscillator/, 'Sample voice engine must never synthesize fallback oscillators');
+
+  const seqSource = fs.readFileSync(path.join(jsDir, 'sequencer.js'), 'utf8');
+  assert.doesNotMatch(seqSource, /playMutatedVoice|createOscillator/, 'PR05 SEQ-16 must never use legacy oscillator playback');
+
+  const seqEngineSource = fs.readFileSync(path.join(jsDir, 'sequencer-engine.js'), 'utf8');
+  assert.doesNotMatch(seqEngineSource, /playMutatedVoice|createOscillator|Date\.now/, 'PR05 sequencer-engine must use Web Audio clock and never synthesize oscillators');
+
+  const audioSource = fs.readFileSync(path.join(jsDir, 'audio.js'), 'utf8');
+  assert.doesNotMatch(audioSource, /playMutatedVoice/, 'Legacy playMutatedVoice synth must be removed in PR05');
 
   const graph = new Map();
   for (const file of jsFiles) {
