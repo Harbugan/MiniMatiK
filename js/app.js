@@ -11,7 +11,17 @@ import { formatSlotNumber } from './soundbank-state.js';
 import { playClick, sampleVoiceEngine, stopAllPerformanceAudio } from './audio.js';
 import { updateAllHUD, startPS1Display } from './display.js';
 import { initMutate, renderMutateConfigUI, setJoystickPosition } from './mutate.js';
-import { initSequencer, renderSequencerGrid, startTransport, stopTransport } from './sequencer.js';
+import {
+  initSequencer,
+  renderSequencerGrid,
+  renderNoteDetailOverlay,
+  startTransport,
+  stopTransport,
+  stepSceneSelection,
+  updateSequencerBpm,
+  closeSequencerOverlays,
+  hasOpenSequencerOverlay
+} from './sequencer.js';
 import {
   initChordMatiK,
   renderChordMatiKUI,
@@ -33,9 +43,12 @@ export function switchDeckMode(idx) {
   state.modeIndex = (idx + DECK_MODES.length) % DECK_MODES.length;
   const modeName = DECK_MODES[state.modeIndex];
 
-  // Close non-recording overlays cleanly when navigating away from SAMPLER
+  // Close non-recording overlays cleanly when navigating away from SAMPLER or SEQ
   if (modeName !== 'SAMPLER' && state.samplerUI.overlayMode && !isSamplerBusy()) {
     closeSamplerOverlay();
+  }
+  if (modeName !== 'SEQ' && hasOpenSequencerOverlay()) {
+    closeSequencerOverlays();
   }
 
   // 4-position rotary pointer angles
@@ -104,6 +117,9 @@ export function renderTrackBar() {
       renderTrackBar();
       renderChordMatiKUI();
       renderSequencerGrid();
+      if (state.sequencerUI.detailOpen) {
+        renderNoteDetailOverlay();
+      }
       if (state.samplerUI.overlayMode === 'acquire') {
         updateAcquireRoutingHint();
       }
@@ -149,44 +165,46 @@ function bindGlobalControls() {
     renderChordMatiKUI();
   });
 
-  // Scene & BPM Controls
+  // Scene & BPM Controls (Scene switches queue at next bar while playing; immediate while stopped)
   document.getElementById('scenePrevBtn').addEventListener('click', () => {
-    state.currentScene = (state.currentScene - 1 + 64) % 64;
+    stepSceneSelection(-1);
     playClick(740);
     renderSequencerGrid();
     updateAllHUD();
   });
   document.getElementById('sceneNextBtn').addEventListener('click', () => {
-    state.currentScene = (state.currentScene + 1) % 64;
+    stepSceneSelection(1);
     playClick(840);
     renderSequencerGrid();
     updateAllHUD();
   });
   document.getElementById('sceneJumpBtn').addEventListener('click', () => {
-    state.currentScene = (state.currentScene + 8) % 64;
+    stepSceneSelection(8);
     playClick(940);
     renderSequencerGrid();
     updateAllHUD();
   });
   document.getElementById('bpmDownBtn').addEventListener('click', () => {
-    state.bpm = Math.max(60, state.bpm - 5);
-    if (state.isPlaying) startTransport();
-    updateAllHUD();
+    updateSequencerBpm(state.bpm - 5);
   });
   document.getElementById('bpmUpBtn').addEventListener('click', () => {
-    state.bpm = Math.min(200, state.bpm + 5);
-    if (state.isPlaying) startTransport();
-    updateAllHUD();
+    updateSequencerBpm(state.bpm + 5);
   });
 
   // Keyboard shortcuts (Escape closes non-recording overlay; 1..7 & Space guarded while overlay/recording active)
   window.addEventListener('keydown', (e) => {
     if (e.repeat) return;
-    if (e.key === 'Escape' && state.samplerUI.overlayMode && !isSamplerBusy()) {
-      closeSamplerOverlay();
-      return;
+    if (e.key === 'Escape') {
+      if (state.samplerUI.overlayMode && !isSamplerBusy()) {
+        closeSamplerOverlay();
+        return;
+      }
+      if (hasOpenSequencerOverlay()) {
+        closeSequencerOverlays();
+        return;
+      }
     }
-    if (state.samplerUI.overlayMode || isSamplerBusy()) {
+    if (state.samplerUI.overlayMode || hasOpenSequencerOverlay() || isSamplerBusy()) {
       return;
     }
     if (e.key >= '1' && e.key <= '7') {
@@ -206,8 +224,9 @@ function bindGlobalControls() {
     }
   });
 
-  // Ensure microphone tracks, sample preview, and performance voices are always released on page leave
+  // Ensure microphone tracks, sample preview, sequencer clock, and voices are always released on page leave
   const handlePageUnload = () => {
+    stopTransport(false);
     cleanupSamplerResources();
     releaseAllChordMatiKInputs();
     stopAllPerformanceAudio();
